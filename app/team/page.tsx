@@ -22,6 +22,8 @@ interface User {
   name: string;
   email: string;
   role: "admin" | "user";
+  youtubeAccess?: boolean;
+  linkedinAccess?: boolean;
   createdAt: string;
 }
 
@@ -32,7 +34,14 @@ export default function TeamPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "user" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "user",
+    youtubeAccess: false,
+    linkedinAccess: false,
+  });
   const [error, setError] = useState("");
   const [lastCreatedUser, setLastCreatedUser] = useState<{ name: string; email: string; password: string; role: string } | null>(null);
 
@@ -90,14 +99,14 @@ export default function TeamPage() {
         setTimeout(() => {
           setShowModal(false);
           setEditingUser(null);
-          setFormData({ name: "", email: "", password: "", role: "user" });
+          setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false });
           setLastCreatedUser(null);
           fetchUsers();
         }, 2000);
       } else {
         setShowModal(false);
         setEditingUser(null);
-        setFormData({ name: "", email: "", password: "", role: "user" });
+        setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false });
         setLastCreatedUser(null);
         fetchUsers();
       }
@@ -131,7 +140,9 @@ export default function TeamPage() {
       name: user.name || "", 
       email: user.email, 
       password: "", 
-      role: user.role 
+      role: user.role,
+      youtubeAccess: Boolean(user.youtubeAccess),
+      linkedinAccess: Boolean(user.linkedinAccess),
     });
     setLastCreatedUser(null);
     setShowModal(true);
@@ -188,7 +199,7 @@ export default function TeamPage() {
 
   const openCreateModal = () => {
     setEditingUser(null);
-    setFormData({ name: "", email: "", password: "", role: "user" });
+    setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false });
     setLastCreatedUser(null);
     setShowModal(true);
   };
@@ -406,6 +417,38 @@ export default function TeamPage() {
                             <option value="user">Member</option>
                             <option value="admin">Admin</option>
                           </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1 ml-1 uppercase">
+                            YouTube Access
+                          </label>
+                          <label className="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(formData.youtubeAccess)}
+                              onChange={(e) => setFormData({ ...formData, youtubeAccess: e.target.checked })}
+                              className="h-4 w-4 rounded border-white/20 bg-transparent text-orange-500 focus:ring-orange-500/50"
+                            />
+                            <span className="text-sm text-gray-200">Allow access to YouTube tools</span>
+                          </label>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1 ml-1 uppercase">
+                            LinkedIn Access
+                          </label>
+                          <label className="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(formData.linkedinAccess)}
+                              onChange={(e) =>
+                                setFormData({ ...formData, linkedinAccess: e.target.checked })
+                              }
+                              className="h-4 w-4 rounded border-white/20 bg-transparent text-orange-500 focus:ring-orange-500/50"
+                            />
+                            <span className="text-sm text-gray-200">Allow access to LinkedIn tools</span>
+                          </label>
                         </div>
 
                         <div className="flex justify-end gap-3 mt-6">

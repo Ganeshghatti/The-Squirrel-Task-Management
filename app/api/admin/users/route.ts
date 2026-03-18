@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { email, password, name, role } = await request.json();
+    const { email, password, name, role, youtubeAccess, linkedinAccess } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -65,6 +65,8 @@ export async function POST(request: NextRequest) {
       password: hashedPassword,
       name: name || email.split("@")[0],
       role: role === "admin" ? UserRole.ADMIN : UserRole.USER,
+      youtubeAccess: Boolean(youtubeAccess),
+      linkedinAccess: Boolean(linkedinAccess),
     });
 
     return NextResponse.json(
@@ -75,6 +77,8 @@ export async function POST(request: NextRequest) {
           email: newUser.email,
           name: newUser.name,
           role: newUser.role,
+          youtubeAccess: newUser.youtubeAccess,
+          linkedinAccess: newUser.linkedinAccess,
         },
       },
       { status: 201 }

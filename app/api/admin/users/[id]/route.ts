@@ -17,12 +17,18 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { email, name, role, password } = await request.json();
+    const { email, name, role, password, youtubeAccess, linkedinAccess } = await request.json();
     const userId = params.id;
 
     await connectDB();
 
-    const updateData: any = { email, name, role };
+    const updateData: any = {
+      ...(email !== undefined ? { email } : {}),
+      ...(name !== undefined ? { name } : {}),
+      ...(role !== undefined ? { role } : {}),
+      ...(youtubeAccess !== undefined ? { youtubeAccess: Boolean(youtubeAccess) } : {}),
+      ...(linkedinAccess !== undefined ? { linkedinAccess: Boolean(linkedinAccess) } : {}),
+    };
     
     if (password && password.trim() !== "") {
       if (password.length < 6) {

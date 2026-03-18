@@ -10,6 +10,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: UserRole;
+  youtubeAccess: boolean;
+  linkedinAccess: boolean;
   name?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -33,6 +35,14 @@ const UserSchema: Schema = new Schema(
       type: String,
       enum: Object.values(UserRole),
       default: UserRole.USER,
+    },
+    youtubeAccess: {
+      type: Boolean,
+      default: false,
+    },
+    linkedinAccess: {
+      type: Boolean,
+      default: false,
     },
     name: {
       type: String,

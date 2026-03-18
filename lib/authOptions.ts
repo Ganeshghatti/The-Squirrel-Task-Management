@@ -40,6 +40,8 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name || user.email,
           role: user.role,
+          youtubeAccess: Boolean((user as any).youtubeAccess),
+          linkedinAccess: Boolean((user as any).linkedinAccess),
         };
       },
     }),
@@ -49,6 +51,8 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = (user as any).role;
         token.id = (user as any).id;
+        token.youtubeAccess = (user as any).youtubeAccess;
+        token.linkedinAccess = (user as any).linkedinAccess;
       }
       return token;
     },
@@ -56,6 +60,8 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         (session.user as any).role = token.role;
         (session.user as any).id = token.id;
+        (session.user as any).youtubeAccess = (token as any).youtubeAccess;
+        (session.user as any).linkedinAccess = (token as any).linkedinAccess;
       }
       return session;
     },

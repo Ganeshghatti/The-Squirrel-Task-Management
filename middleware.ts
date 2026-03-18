@@ -3,6 +3,25 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
+    const pathname = req.nextUrl.pathname;
+    const token = (req as any).nextauth?.token as
+      | { role?: string; youtubeAccess?: boolean; linkedinAccess?: boolean }
+      | undefined;
+
+    if (pathname.startsWith("/youtube")) {
+      const allowed = token?.role === "admin" || token?.youtubeAccess === true;
+      if (!allowed) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
+    }
+
+    if (pathname.startsWith("/linkedin")) {
+      const allowed = token?.role === "admin" || token?.linkedinAccess === true;
+      if (!allowed) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
+    }
+
     return NextResponse.next();
   },
   {
@@ -13,6 +32,6 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/youtube/:path*", "/linkedin/:path*"],
 };
 

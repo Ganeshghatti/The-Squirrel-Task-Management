@@ -41,11 +41,13 @@ interface Task {
   assignDate: string;
   expectedDeliveryDate: string;
   actualDeliveryDate?: string;
-  assignee: {
-    _id: string;
-    name: string;
-    email: string;
-  };
+  assignee:
+    | {
+        _id: string;
+        name: string;
+        email: string;
+      }
+    | null;
   status: TaskStatus;
   priority: TaskPriority;
 }
@@ -151,7 +153,7 @@ function TaskCard({ task, onEdit, onView, onDelete, isAdmin }: {
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <User size={12} />
-          <span>{task.assignee.name}</span>
+          <span>{task.assignee?.name || task.assignee?.email || "Unassigned"}</span>
         </div>
         <span className={`text-xs px-2 py-1 rounded-full ${priorityConfig[task.priority].color}`}>
           {priorityConfig[task.priority].label}
@@ -490,7 +492,7 @@ export default function KanbanBoard({ isAdmin, currentUserId }: KanbanBoardProps
         assignDate: task.assignDate.split("T")[0],
         expectedDeliveryDate: task.expectedDeliveryDate.split("T")[0],
         actualDeliveryDate: task.actualDeliveryDate ? task.actualDeliveryDate.split("T")[0] : "",
-        assignee: task.assignee._id,
+        assignee: task.assignee?._id || "",
         status: task.status,
         priority: task.priority,
       });
@@ -504,7 +506,7 @@ export default function KanbanBoard({ isAdmin, currentUserId }: KanbanBoardProps
         assignDate: task.assignDate.split("T")[0],
         expectedDeliveryDate: task.expectedDeliveryDate.split("T")[0],
         actualDeliveryDate: task.actualDeliveryDate ? task.actualDeliveryDate.split("T")[0] : "",
-        assignee: task.assignee._id,
+        assignee: task.assignee?._id || "",
         status: task.status,
         priority: task.priority,
       });
@@ -521,7 +523,7 @@ export default function KanbanBoard({ isAdmin, currentUserId }: KanbanBoardProps
     // Filter by assignee if selected
     if (selectedAssigneeFilter) {
       filteredTasks = filteredTasks.filter(
-        (task) => task.assignee._id === selectedAssigneeFilter
+        (task) => task.assignee?._id === selectedAssigneeFilter
       );
     }
     
@@ -532,6 +534,7 @@ export default function KanbanBoard({ isAdmin, currentUserId }: KanbanBoardProps
   const getUniqueAssignees = () => {
     const assigneeMap = new Map<string, { _id: string; name: string; email: string }>();
     tasks.forEach((task) => {
+      if (!task.assignee?._id) return;
       if (!assigneeMap.has(task.assignee._id)) {
         assigneeMap.set(task.assignee._id, task.assignee);
       }
@@ -551,7 +554,7 @@ export default function KanbanBoard({ isAdmin, currentUserId }: KanbanBoardProps
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <User size={12} />
-            <span>{task.assignee.name}</span>
+            <span>{task.assignee?.name || task.assignee?.email || "Unassigned"}</span>
           </div>
           <span className={`text-xs px-2 py-1 rounded-full ${priorityConfig[task.priority].color}`}>
             {priorityConfig[task.priority].label}
@@ -1096,7 +1099,9 @@ export default function KanbanBoard({ isAdmin, currentUserId }: KanbanBoardProps
                       <label className="block text-sm font-medium text-gray-400">Assignee</label>
                       <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white flex items-center gap-2">
                         <User size={16} className="text-gray-400" />
-                        {viewingTask.assignee.name || viewingTask.assignee.email}
+                        {viewingTask.assignee?.name ||
+                          viewingTask.assignee?.email ||
+                          "Unassigned"}
                       </div>
                     </div>
                   </div>

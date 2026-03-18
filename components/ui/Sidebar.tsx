@@ -1,10 +1,13 @@
 "use client";
 
 import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   LayoutDashboard, 
   Users, 
+  Video,
+  Briefcase,
   LogOut, 
   X
 } from "lucide-react";
@@ -20,9 +23,14 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, setIsOpen, isAdmin }: SidebarProps) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const youtubeAccess = (session?.user as { youtubeAccess?: boolean } | undefined)?.youtubeAccess;
+  const linkedinAccess = (session?.user as { linkedinAccess?: boolean } | undefined)?.linkedinAccess;
   
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+    ...((isAdmin || youtubeAccess) ? [{ icon: Video, label: "YouTube", href: "/youtube" }] : []),
+    ...((isAdmin || linkedinAccess) ? [{ icon: Briefcase, label: "LinkedIn", href: "/linkedin" }] : []),
     ...(isAdmin ? [{ icon: Users, label: "Team", href: "/team" }] : []),
   ];
 
