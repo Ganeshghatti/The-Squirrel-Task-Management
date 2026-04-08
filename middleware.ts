@@ -5,7 +5,7 @@ export default withAuth(
   function middleware(req) {
     const pathname = req.nextUrl.pathname;
     const token = (req as any).nextauth?.token as
-      | { role?: string; youtubeAccess?: boolean; linkedinAccess?: boolean }
+      | { role?: string; youtubeAccess?: boolean; linkedinAccess?: boolean; xAccess?: boolean }
       | undefined;
 
     if (pathname.startsWith("/youtube")) {
@@ -22,6 +22,13 @@ export default withAuth(
       }
     }
 
+    if (pathname.startsWith("/x")) {
+      const allowed = token?.role === "admin" || token?.xAccess === true;
+      if (!allowed) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
+    }
+
     return NextResponse.next();
   },
   {
@@ -32,6 +39,6 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/youtube/:path*", "/linkedin/:path*"],
+  matcher: ["/dashboard/:path*", "/youtube/:path*", "/linkedin/:path*", "/x/:path*"],
 };
 

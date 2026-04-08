@@ -17,7 +17,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { email, name, role, password, youtubeAccess, linkedinAccess } = await request.json();
+    const { email, name, role, password, youtubeAccess, linkedinAccess, xAccess } = await request.json();
     const userId = params.id;
 
     await connectDB();
@@ -28,6 +28,7 @@ export async function PUT(
       ...(role !== undefined ? { role } : {}),
       ...(youtubeAccess !== undefined ? { youtubeAccess: Boolean(youtubeAccess) } : {}),
       ...(linkedinAccess !== undefined ? { linkedinAccess: Boolean(linkedinAccess) } : {}),
+      ...(xAccess !== undefined ? { xAccess: Boolean(xAccess) } : {}),
     };
     
     if (password && password.trim() !== "") {

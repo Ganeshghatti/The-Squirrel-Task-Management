@@ -8,6 +8,7 @@ import {
   Users, 
   Video,
   Briefcase,
+  Sparkles,
   LogOut, 
   X
 } from "lucide-react";
@@ -26,11 +27,13 @@ export default function Sidebar({ isOpen, setIsOpen, isAdmin }: SidebarProps) {
   const { data: session } = useSession();
   const youtubeAccess = (session?.user as { youtubeAccess?: boolean } | undefined)?.youtubeAccess;
   const linkedinAccess = (session?.user as { linkedinAccess?: boolean } | undefined)?.linkedinAccess;
+  const xAccess = (session?.user as { xAccess?: boolean } | undefined)?.xAccess;
   
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     ...((isAdmin || youtubeAccess) ? [{ icon: Video, label: "YouTube", href: "/youtube" }] : []),
     ...((isAdmin || linkedinAccess) ? [{ icon: Briefcase, label: "LinkedIn", href: "/linkedin" }] : []),
+    ...((isAdmin || xAccess) ? [{ icon: Sparkles, label: "X", href: "/x" }] : []),
     ...(isAdmin ? [{ icon: Users, label: "Team", href: "/team" }] : []),
   ];
 
