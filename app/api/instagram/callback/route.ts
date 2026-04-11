@@ -156,6 +156,7 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error(`${LOG} catch`, error);
     const message = error instanceof Error ? error.message : "OAuth failed";
+    console.log(message);
     // return Response.redirect(`${origin}/instagram?error=${encodeURIComponent(message)}`);
   }
 }
