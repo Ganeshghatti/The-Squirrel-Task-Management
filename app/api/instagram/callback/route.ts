@@ -152,10 +152,10 @@ export async function GET(request: Request) {
     );
 
     console.log(`${LOG} DB upsert OK → connected=true`);
-    return Response.redirect(`${origin}/instagram?connected=true`);
+    // return Response.redirect(`${origin}/instagram?connected=true`);
   } catch (error) {
     console.error(`${LOG} catch`, error);
     const message = error instanceof Error ? error.message : "OAuth failed";
-    return Response.redirect(`${origin}/instagram?error=${encodeURIComponent(message)}`);
+    // return Response.redirect(`${origin}/instagram?error=${encodeURIComponent(message)}`);
   }
 }
