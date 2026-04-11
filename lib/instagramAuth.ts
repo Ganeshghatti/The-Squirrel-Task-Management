@@ -55,5 +55,3 @@ export const INSTAGRAM_OAUTH_SCOPES = [
 
 /** graph.instagram.com + api.instagram.com version. */
 export const INSTAGRAM_GRAPH_VERSION = "v25.0";
-
-export const INSTAGRAM_AUTHORIZE_URL = "https://www.instagram.com/oauth/authorize";

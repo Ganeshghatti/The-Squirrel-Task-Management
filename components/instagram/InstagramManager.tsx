@@ -36,6 +36,9 @@ interface FlashMessage {
   text: string;
 }
 
+const CONNECT_INSTAGRAM_HREF =
+  "https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=920212874225275&redirect_uri=https://tasks.thesquirrel.tech/api/instagram/callback&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights";
+
 function formatSize(bytes: number) {
   if (!bytes) return "";
   if (bytes < 1024) return `${bytes} B`;
@@ -220,7 +223,7 @@ export default function InstagramManager() {
           </p>
         </div>
         <a
-          href="/api/instagram/auth"
+          href={CONNECT_INSTAGRAM_HREF}
           className="inline-flex items-center justify-center rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/15 px-4 py-3 text-sm font-medium text-fuchsia-100 transition hover:border-fuchsia-400/40 hover:bg-fuchsia-500/20"
         >
           Connect Instagram
