@@ -24,6 +24,7 @@ interface User {
   role: "admin" | "user";
   youtubeAccess?: boolean;
   linkedinAccess?: boolean;
+  instagramAccess?: boolean;
   xAccess?: boolean;
   createdAt: string;
 }
@@ -42,6 +43,7 @@ export default function TeamPage() {
     role: "user",
     youtubeAccess: false,
     linkedinAccess: false,
+    instagramAccess: false,
     xAccess: false,
   });
   const [error, setError] = useState("");
@@ -101,14 +103,14 @@ export default function TeamPage() {
         setTimeout(() => {
           setShowModal(false);
           setEditingUser(null);
-          setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false, xAccess: false });
+          setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false, instagramAccess: false, xAccess: false });
           setLastCreatedUser(null);
           fetchUsers();
         }, 2000);
       } else {
         setShowModal(false);
         setEditingUser(null);
-        setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false, xAccess: false });
+        setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false, instagramAccess: false, xAccess: false });
         setLastCreatedUser(null);
         fetchUsers();
       }
@@ -145,6 +147,7 @@ export default function TeamPage() {
       role: user.role,
       youtubeAccess: Boolean(user.youtubeAccess),
       linkedinAccess: Boolean(user.linkedinAccess),
+      instagramAccess: Boolean(user.instagramAccess),
       xAccess: Boolean(user.xAccess),
     });
     setLastCreatedUser(null);
@@ -202,7 +205,7 @@ export default function TeamPage() {
 
   const openCreateModal = () => {
     setEditingUser(null);
-    setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false, xAccess: false });
+    setFormData({ name: "", email: "", password: "", role: "user", youtubeAccess: false, linkedinAccess: false, instagramAccess: false, xAccess: false });
     setLastCreatedUser(null);
     setShowModal(true);
   };
@@ -451,6 +454,23 @@ export default function TeamPage() {
                               className="h-4 w-4 rounded border-white/20 bg-transparent text-orange-500 focus:ring-orange-500/50"
                             />
                             <span className="text-sm text-gray-200">Allow access to LinkedIn tools</span>
+                          </label>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1 ml-1 uppercase">
+                            Instagram Access
+                          </label>
+                          <label className="flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white">
+                            <input
+                              type="checkbox"
+                              checked={Boolean(formData.instagramAccess)}
+                              onChange={(e) =>
+                                setFormData({ ...formData, instagramAccess: e.target.checked })
+                              }
+                              className="h-4 w-4 rounded border-white/20 bg-transparent text-orange-500 focus:ring-orange-500/50"
+                            />
+                            <span className="text-sm text-gray-200">Allow access to Instagram tools</span>
                           </label>
                         </div>
 

@@ -42,6 +42,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           youtubeAccess: Boolean((user as any).youtubeAccess),
           linkedinAccess: Boolean((user as any).linkedinAccess),
+          instagramAccess: Boolean((user as any).instagramAccess),
           xAccess: Boolean((user as any).xAccess),
         };
       },
@@ -54,6 +55,7 @@ export const authOptions: NextAuthOptions = {
         token.id = (user as any).id;
         token.youtubeAccess = (user as any).youtubeAccess;
         token.linkedinAccess = (user as any).linkedinAccess;
+        token.instagramAccess = (user as any).instagramAccess;
         token.xAccess = (user as any).xAccess;
       }
       return token;
@@ -64,6 +66,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id;
         (session.user as any).youtubeAccess = (token as any).youtubeAccess;
         (session.user as any).linkedinAccess = (token as any).linkedinAccess;
+        (session.user as any).instagramAccess = (token as any).instagramAccess;
         (session.user as any).xAccess = (token as any).xAccess;
       }
       return session;

@@ -3,14 +3,15 @@
 import { signOut } from "next-auth/react";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  LayoutDashboard, 
-  Users, 
+import {
+  LayoutDashboard,
+  Users,
   Video,
   Briefcase,
+  Instagram,
   Sparkles,
-  LogOut, 
-  X
+  LogOut,
+  X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -27,12 +28,14 @@ export default function Sidebar({ isOpen, setIsOpen, isAdmin }: SidebarProps) {
   const { data: session } = useSession();
   const youtubeAccess = (session?.user as { youtubeAccess?: boolean } | undefined)?.youtubeAccess;
   const linkedinAccess = (session?.user as { linkedinAccess?: boolean } | undefined)?.linkedinAccess;
+  const instagramAccess = (session?.user as { instagramAccess?: boolean } | undefined)?.instagramAccess;
   const xAccess = (session?.user as { xAccess?: boolean } | undefined)?.xAccess;
   
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     ...((isAdmin || youtubeAccess) ? [{ icon: Video, label: "YouTube", href: "/youtube" }] : []),
     ...((isAdmin || linkedinAccess) ? [{ icon: Briefcase, label: "LinkedIn", href: "/linkedin" }] : []),
+    ...((isAdmin || instagramAccess) ? [{ icon: Instagram, label: "Instagram", href: "/instagram" }] : []),
     ...((isAdmin || xAccess) ? [{ icon: Sparkles, label: "X", href: "/x" }] : []),
     ...(isAdmin ? [{ icon: Users, label: "Team", href: "/team" }] : []),
   ];

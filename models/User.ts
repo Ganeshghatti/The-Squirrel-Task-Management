@@ -12,6 +12,7 @@ export interface IUser extends Document {
   role: UserRole;
   youtubeAccess: boolean;
   linkedinAccess: boolean;
+  instagramAccess: boolean;
   xAccess: boolean;
   name?: string;
   createdAt: Date;
@@ -42,6 +43,10 @@ const UserSchema: Schema = new Schema(
       default: false,
     },
     linkedinAccess: {
+      type: Boolean,
+      default: false,
+    },
+    instagramAccess: {
       type: Boolean,
       default: false,
     },
