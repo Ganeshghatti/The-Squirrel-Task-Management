@@ -56,3 +56,30 @@ export const INSTAGRAM_OAUTH_SCOPES = [
 
 /** graph.instagram.com + api.instagram.com version. */
 export const INSTAGRAM_GRAPH_VERSION = "v25.0";
+
+const CALLBACK_PATH = "/api/instagram/callback";
+
+/**
+ * `redirect_uri` sent to Instagram's code exchange must be **byte-identical** to the
+ * `redirect_uri` in the authorize URL. Prefer this env behind nginx so it never tracks
+ * a wrong `Host` / `x-forwarded-host`.
+ *
+ * @see https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/
+ */
+export function getInstagramOAuthRedirectUri(): string {
+  const explicit = process.env.INSTAGRAM_OAUTH_REDIRECT_URI?.trim();
+  if (explicit) {
+    return explicit.replace(/\/+$/, "");
+  }
+
+  const base =
+    process.env.NEXTAUTH_URL?.trim() || process.env.AUTH_URL?.trim() || "";
+  if (base) {
+    const u = new URL(base);
+    return `${u.origin}${CALLBACK_PATH}`;
+  }
+
+  throw new Error(
+    "Set INSTAGRAM_OAUTH_REDIRECT_URI (e.g. https://tasks.thesquirrel.tech/api/instagram/callback) or NEXTAUTH_URL so the OAuth redirect_uri matches your Instagram authorize link."
+  );
+}
