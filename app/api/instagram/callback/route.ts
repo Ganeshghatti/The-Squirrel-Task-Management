@@ -9,32 +9,13 @@ import {
   fetchInstagramMe,
 } from "@/lib/instagram";
 import { getPublicOriginFromRequest } from "@/lib/getPublicOriginFromRequest";
+import {
+  buildInstagramOAuthAuthorizeUrl,
+  resolveInstagramOAuthRedirectUri,
+} from "@/lib/instagramOAuthFlow";
+import { getInstagramOAuthClientId } from "@/lib/instagramAuth";
 
 const LOG = "[instagram/callback]";
-
-/**
- * Must match `INSTAGRAM_OAUTH_REDIRECT_URI` in `InstagramManager.tsx` (byte-for-byte).
- * Prefer INSTAGRAM_REDIRECT_URI on the server; NEXT_PUBLIC_* for parity with the client bundle.
- */
-const DEFAULT_INSTAGRAM_OAUTH_REDIRECT_URI =
-  "https://tasks.thesquirrel.tech/api/instagram/callback";
-
-function resolveInstagramOAuthRedirectUri(): string {
-  const fromServer = process.env.INSTAGRAM_REDIRECT_URI?.trim();
-  const fromPublic = process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI?.trim();
-  const resolved =
-    fromServer || fromPublic || DEFAULT_INSTAGRAM_OAUTH_REDIRECT_URI;
-
-  console.log(`${LOG} resolveInstagramOAuthRedirectUri`, {
-    usedINSTAGRAM_REDIRECT_URI: Boolean(fromServer),
-    usedNEXT_PUBLIC_INSTAGRAM_REDIRECT_URI: Boolean(fromPublic),
-    usedDefault: !fromServer && !fromPublic,
-    resolved,
-    length: resolved.length,
-  });
-
-  return resolved;
-}
 
 export async function GET(request: Request) {
   const requestUrl = request.url;
@@ -98,11 +79,19 @@ export async function GET(request: Request) {
   }
 
   const redirectUri = resolveInstagramOAuthRedirectUri();
+  const clientIdForLog = getInstagramOAuthClientId();
+  let serverAuthorizeUrl = "";
+  try {
+    serverAuthorizeUrl = buildInstagramOAuthAuthorizeUrl();
+  } catch {
+    serverAuthorizeUrl = "";
+  }
 
   console.log(`${LOG} token exchange inputs`, {
     redirectUri,
     redirectUriJson: JSON.stringify(redirectUri),
-    appIdSource: "getInstagramAppCredentials()",
+    clientIdForLog,
+    serverAuthorizeUrlPreview: serverAuthorizeUrl.slice(0, 120),
   });
 
   try {
@@ -152,11 +141,10 @@ export async function GET(request: Request) {
     );
 
     console.log(`${LOG} DB upsert OK → connected=true`);
-    // return Response.redirect(`${origin}/instagram?connected=true`);
+    return Response.redirect(`${origin}/instagram?connected=true`);
   } catch (error) {
     console.error(`${LOG} catch`, error);
     const message = error instanceof Error ? error.message : "OAuth failed";
-    console.log(message);
-    // return Response.redirect(`${origin}/instagram?error=${encodeURIComponent(message)}`);
+    return Response.redirect(`${origin}/instagram?error=${encodeURIComponent(message)}`);
   }
 }

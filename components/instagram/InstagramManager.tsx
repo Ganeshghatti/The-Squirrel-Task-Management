@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { INSTAGRAM_OAUTH_SCOPES } from "@/lib/instagramAuth";
 
 interface IgAccount {
   igUserId: string;
@@ -37,21 +36,6 @@ interface FlashMessage {
   text: string;
 }
 
-/** Must match `resolveInstagramOAuthRedirectUri` in `app/api/instagram/callback/route.ts`. */
-const INSTAGRAM_OAUTH_REDIRECT_URI =
-  process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI?.trim() ||
-  "https://tasks.thesquirrel.tech/api/instagram/callback";
-const INSTAGRAM_CLIENT_ID =
-  process.env.NEXT_PUBLIC_INSTAGRAM_APP_ID?.trim() || "920212874225275";
-
-const CONNECT_INSTAGRAM_HREF = `https://www.instagram.com/oauth/authorize?${new URLSearchParams({
-  force_reauth: "true",
-  client_id: INSTAGRAM_CLIENT_ID,
-  redirect_uri: INSTAGRAM_OAUTH_REDIRECT_URI,
-  response_type: "code",
-  scope: INSTAGRAM_OAUTH_SCOPES,
-}).toString()}`;
-
 function formatSize(bytes: number) {
   if (!bytes) return "";
   if (bytes < 1024) return `${bytes} B`;
@@ -59,7 +43,12 @@ function formatSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function InstagramManager() {
+type Props = {
+  /** Built on the server so `client_id` + `redirect_uri` match the token exchange. */
+  instagramAuthorizeUrl: string;
+};
+
+export default function InstagramManager({ instagramAuthorizeUrl }: Props) {
   const [accounts, setAccounts] = useState<IgAccount[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -236,8 +225,12 @@ export default function InstagramManager() {
           </p>
         </div>
         <a
-          href={CONNECT_INSTAGRAM_HREF}
-          className="inline-flex items-center justify-center rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/15 px-4 py-3 text-sm font-medium text-fuchsia-100 transition hover:border-fuchsia-400/40 hover:bg-fuchsia-500/20"
+          href={instagramAuthorizeUrl || "#"}
+          aria-disabled={!instagramAuthorizeUrl}
+          title={!instagramAuthorizeUrl ? "OAuth URL could not be built (check server env)." : undefined}
+          className={`inline-flex items-center justify-center rounded-xl border border-fuchsia-500/30 bg-fuchsia-500/15 px-4 py-3 text-sm font-medium text-fuchsia-100 transition hover:border-fuchsia-400/40 hover:bg-fuchsia-500/20 ${
+            !instagramAuthorizeUrl ? "pointer-events-none opacity-50" : ""
+          }`}
         >
           Connect Instagram
         </a>

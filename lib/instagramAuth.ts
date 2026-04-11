@@ -21,12 +21,19 @@ export function getFacebookAppCredentials(): FacebookAppCredentials {
   return { appId, appSecret };
 }
 
-/** Instagram Login — App ID must match the `client_id` in your Connect URL (see Meta → Instagram use case). */
-export function getInstagramAppCredentials(): FacebookAppCredentials {
-  const appId =
+/** Instagram Login `client_id` — same source for authorize URL + token exchange. */
+export function getInstagramOAuthClientId(): string {
+  return (
     process.env.INSTAGRAM_APP_ID?.trim() ||
     process.env.INSTAGRAM_CLIENT_ID?.trim() ||
-    "920212874225275";
+    process.env.NEXT_PUBLIC_INSTAGRAM_APP_ID?.trim() ||
+    "920212874225275"
+  );
+}
+
+/** Instagram Login — App ID must match the `client_id` in your Connect URL (see Meta → Instagram use case). */
+export function getInstagramAppCredentials(): FacebookAppCredentials {
+  const appId = getInstagramOAuthClientId();
   const appSecret =
     process.env.INSTAGRAM_APP_SECRET?.trim() ||
     process.env.INSTAGRAM_CLIENT_SECRET?.trim() ||
