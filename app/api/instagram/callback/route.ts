@@ -41,12 +41,12 @@ export async function GET(request: Request) {
     );
   }
 
-  const { appId, appSecret } = getInstagramAppCredentials();
   const host = request.headers.get("host") || "localhost:3000";
   const protocol = host.includes("localhost") ? "http" : "https";
   const redirectUri = `${protocol}://${host}/api/instagram/callback`;
 
   try {
+    const { appId, appSecret } = getInstagramAppCredentials();
     const { access_token: shortToken, user_id: igUserIdFromToken } =
       await exchangeInstagramAuthCode(appId, appSecret, redirectUri, code);
 

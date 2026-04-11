@@ -21,11 +21,12 @@ export function getFacebookAppCredentials(): FacebookAppCredentials {
   return { appId, appSecret };
 }
 
-/** Instagram Login (API setup with Instagram login) — App Dashboard shows Instagram App ID. */
+/** Instagram Login — App ID must match the `client_id` in your Connect URL (see Meta → Instagram use case). */
 export function getInstagramAppCredentials(): FacebookAppCredentials {
   const appId =
     process.env.INSTAGRAM_APP_ID?.trim() ||
-    process.env.INSTAGRAM_CLIENT_ID?.trim();
+    process.env.INSTAGRAM_CLIENT_ID?.trim() ||
+    "920212874225275";
   const appSecret =
     process.env.INSTAGRAM_APP_SECRET?.trim() ||
     process.env.INSTAGRAM_CLIENT_SECRET?.trim() ||
