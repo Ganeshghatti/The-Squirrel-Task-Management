@@ -14,7 +14,6 @@ type TwitterPostType = {
   type_id: number;
   name: string;
   description: string;
-  structure?: Record<string, string>;
   characteristics?: Record<string, string>;
   elements_to_include?: string[];
 };
@@ -71,9 +70,6 @@ export default function XPromptGenerator() {
       `Type: ${postType.name}`,
       `Description: ${postType.description}`,
       "",
-      postType.structure
-        ? ["Structure:", formatObjectLines(postType.structure)].join("\n")
-        : "",
       postType.characteristics
         ? ["", "Characteristics:", formatObjectLines(postType.characteristics)].join("\n")
         : "",
@@ -158,15 +154,23 @@ export default function XPromptGenerator() {
                 <p className="mt-2 text-sm font-semibold text-white">{postType.name}</p>
                 <p className="mt-2 text-sm text-gray-400">{postType.description}</p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-gray-500">How it will be shaped</p>
-                <pre className="mt-3 whitespace-pre-wrap text-xs text-gray-300">
-{[
-  postType.structure ? `Structure:\n${formatObjectLines(postType.structure)}` : "",
-  postType.characteristics ? `\nCharacteristics:\n${formatObjectLines(postType.characteristics)}` : "",
-].filter(Boolean).join("\n")}
-                </pre>
-              </div>
+              {(postType.characteristics || postType.elements_to_include?.length) && (
+                <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Style hints</p>
+                  <pre className="mt-3 whitespace-pre-wrap text-xs text-gray-300">
+                    {[
+                      postType.characteristics
+                        ? `Characteristics:\n${formatObjectLines(postType.characteristics)}`
+                        : "",
+                      postType.elements_to_include?.length
+                        ? `\nElements to include:\n${postType.elements_to_include.map((el) => `- ${el}`).join("\n")}`
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join("\n")}
+                  </pre>
+                </div>
+              )}
             </div>
           ) : (
             <p className="mt-4 text-sm text-gray-500">No post type picked.</p>

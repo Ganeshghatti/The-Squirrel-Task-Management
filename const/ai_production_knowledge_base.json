@@ -598,13 +598,6 @@
       "type_id": 1,
       "name": "Problem → Solution Hook",
       "description": "Start with shocking problem, build urgency, present clear solution",
-      "structure": {
-        "line_1": "Attention-grabbing problem statement",
-        "lines_2_3": "Why it's costing them money/time/users",
-        "lines_4_5": "The solution (clear and specific)",
-        "lines_6_7": "Implementation steps or key tactics",
-        "line_8": "CTA, final insight, or memorable metaphor"
-      },
       "characteristics": {
         "length": "8-12 lines",
         "engagement_driver": "Fear of loss + quick win",
@@ -623,12 +616,6 @@
       "type_id": 2,
       "name": "List/Thread Starter",
       "description": "Promise specific number of items, progressive disclosure, thread-friendly",
-      "structure": {
-        "line_1": "X things that [desirable outcome]",
-        "line_2": "Build credibility or set stakes",
-        "lines_3_to_n": "Each point as separate line or tweet",
-        "last_line": "Bonus tip or CTA"
-      },
       "characteristics": {
         "length": "10-15 tweets for thread, 8-10 lines for single post",
         "engagement_driver": "Curiosity + completeness",
@@ -647,14 +634,6 @@
       "type_id": 3,
       "name": "Narrative/Story",
       "description": "Personal experience or case study with concrete numbers and revelation",
-      "structure": {
-        "line_1": "Set the scene (who, when, what)",
-        "lines_2_3": "The problem they faced",
-        "lines_4_5": "What they tried (failed attempts)",
-        "line_6": "The insight/turning point",
-        "lines_7_8": "The result with specific numbers",
-        "line_9": "Lesson learned or key takeaway"
-      },
       "characteristics": {
         "length": "9-12 lines",
         "engagement_driver": "Relatability + social proof",
@@ -673,13 +652,6 @@
       "type_id": 4,
       "name": "Contrarian/Hot Take",
       "description": "Challenge conventional wisdom, present unpopular but valuable truth",
-      "structure": {
-        "line_1": "Controversial statement that opposes common belief",
-        "lines_2_3": "Why everyone gets it wrong",
-        "lines_4_6": "The actual truth with evidence",
-        "lines_7_8": "What to do instead",
-        "line_9": "Reinforcement of contrarian position"
-      },
       "characteristics": {
         "length": "9-11 lines",
         "engagement_driver": "Controversy + validation for minority view",
@@ -704,14 +676,6 @@
       "type_id": 5,
       "name": "Mistake/Warning",
       "description": "Call out common mistake, show consequences, provide correction",
-      "structure": {
-        "line_1": "Most people make this mistake:",
-        "lines_2_3": "Describe the mistake in detail",
-        "lines_4_5": "The consequences (pain points)",
-        "lines_6_7": "The correct approach",
-        "lines_8_9": "Why the correct way works",
-        "line_10": "Warning or call to action"
-      },
       "characteristics": {
         "length": "10-12 lines",
         "engagement_driver": "Fear of making mistake + desire to do it right",
