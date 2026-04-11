@@ -1,18 +1,6 @@
-function isUntrustedForwardedHost(host: string): boolean {
-  const h = host.split(":")[0]?.toLowerCase() ?? "";
-  return (
-    h === "localhost" ||
-    h === "127.0.0.1" ||
-    h === "0.0.0.0" ||
-    h === "[::1]"
-  );
-}
-
 /**
  * `request.url` on serverless / reverse proxies often points at an internal host
  * (e.g. localhost). Redirects must use the browser-facing origin instead.
- *
- * Ignores `x-forwarded-host` when it is loopback (common nginx misconfig toward Node).
  */
 export function getPublicOriginFromRequest(request: Request): {
   origin: string;
@@ -29,7 +17,7 @@ export function getPublicOriginFromRequest(request: Request): {
     ?.trim()
     .toLowerCase();
 
-  if (forwardedHost && !isUntrustedForwardedHost(forwardedHost)) {
+  if (forwardedHost) {
     const protocol: "http" | "https" =
       forwardedProto === "http" || forwardedProto === "https"
         ? forwardedProto

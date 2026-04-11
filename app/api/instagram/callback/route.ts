@@ -1,10 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
 import connectDB from "@/lib/mongodb";
-import {
-  getInstagramAppCredentials,
-  getInstagramOAuthRedirectUri,
-} from "@/lib/instagramAuth";
+import { getInstagramAppCredentials } from "@/lib/instagramAuth";
 import InstagramAccount from "@/models/InstagramAccount";
 import {
   exchangeInstagramAuthCode,
@@ -19,7 +16,8 @@ export async function GET(request: Request) {
   const role = (session?.user as { role?: string } | undefined)?.role;
   const instagramAccess = (session?.user as { instagramAccess?: boolean } | undefined)?.instagramAccess;
 
-  const { origin } = getPublicOriginFromRequest(request);
+  const { origin, host: publicHost, protocol: publicProtocol } =
+    getPublicOriginFromRequest(request);
 
   if (!userId) {
     return Response.redirect(new URL("/login", origin));
@@ -45,8 +43,9 @@ export async function GET(request: Request) {
     );
   }
 
+  const redirectUri = `${publicProtocol}://${publicHost}/api/instagram/callback`;
+
   try {
-    const redirectUri = getInstagramOAuthRedirectUri();
     const { appId, appSecret } = getInstagramAppCredentials();
     const { access_token: shortToken, user_id: igUserIdFromToken } =
       await exchangeInstagramAuthCode(appId, appSecret, redirectUri, code);
