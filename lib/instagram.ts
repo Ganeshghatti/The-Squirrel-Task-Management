@@ -18,6 +18,8 @@ async function readGraphJson<T extends Record<string, unknown>>(res: Response): 
   return data;
 }
 
+const IG_TOKEN_LOG = "[instagram/token]";
+
 /** Step 2: Exchange authorization code for short-lived Instagram user token. */
 export async function exchangeInstagramAuthCode(
   clientId: string,
@@ -33,21 +35,56 @@ export async function exchangeInstagramAuthCode(
     code,
   });
 
+  console.log(`${IG_TOKEN_LOG} exchangeInstagramAuthCode POST`, {
+    endpoint: "https://api.instagram.com/oauth/access_token",
+    clientId,
+    redirectUri,
+    redirectUriJson: JSON.stringify(redirectUri),
+    codeLength: code.length,
+    codePrefix: `${code.slice(0, 12)}…`,
+    bodyRedirectUri: body.get("redirect_uri"),
+    bodyRedirectUriMatchesArg: body.get("redirect_uri") === redirectUri,
+  });
+
   const res = await fetch("https://api.instagram.com/oauth/access_token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: body.toString(),
   });
 
-  const data = (await res.json()) as {
+  const rawText = await res.text();
+  type TokenResponse = {
     access_token?: string;
     user_id?: number | string;
     error_message?: string;
     error_type?: string;
     error?: { message?: string };
   };
+  let data: TokenResponse;
+  try {
+    data = JSON.parse(rawText) as TokenResponse;
+  } catch {
+    console.error(`${IG_TOKEN_LOG} non-JSON response`, {
+      status: res.status,
+      rawTextPreview: rawText.slice(0, 500),
+    });
+    throw new Error(`Instagram token exchange: invalid JSON (${res.status})`);
+  }
+
+  console.log(`${IG_TOKEN_LOG} exchange response`, {
+    ok: res.ok,
+    status: res.status,
+    hasAccessToken: Boolean(data.access_token),
+    error_message: data.error_message,
+    error_type: data.error_type,
+  });
 
   if (!res.ok || !data.access_token) {
+    console.error(`${IG_TOKEN_LOG} exchange failed body`, {
+      status: res.status,
+      parsed: data,
+      rawText: rawText.slice(0, 2000),
+    });
     throw new Error(
       data.error_message ||
         data.error?.message ||
