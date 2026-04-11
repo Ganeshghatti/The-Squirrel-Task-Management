@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { getInstagramOAuthAuthorizeUrl } from "@/lib/instagramAuth";
 
 interface IgAccount {
   igUserId: string;
@@ -36,8 +37,7 @@ interface FlashMessage {
   text: string;
 }
 
-const CONNECT_INSTAGRAM_HREF =
-  "https://www.instagram.com/oauth/authorize?force_reauth=true&client_id=920212874225275&redirect_uri=https://tasks.thesquirrel.tech/api/instagram/callback&response_type=code&scope=instagram_business_basic%2Cinstagram_business_manage_messages%2Cinstagram_business_manage_comments%2Cinstagram_business_content_publish%2Cinstagram_business_manage_insights";
+const CONNECT_INSTAGRAM_HREF = getInstagramOAuthAuthorizeUrl();
 
 function formatSize(bytes: number) {
   if (!bytes) return "";

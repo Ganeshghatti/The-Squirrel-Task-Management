@@ -56,3 +56,41 @@ export const INSTAGRAM_OAUTH_SCOPES = [
 
 /** graph.instagram.com + api.instagram.com version. */
 export const INSTAGRAM_GRAPH_VERSION = "v25.0";
+
+/**
+ * Must match the authorize URL `redirect_uri` exactly (Meta compares strings).
+ * Do not derive this from request headers — proxies can change scheme/host.
+ */
+const DEFAULT_INSTAGRAM_OAUTH_REDIRECT_URI =
+  "https://tasks.thesquirrel.tech/api/instagram/callback";
+
+export function getInstagramOAuthRedirectUri(): string {
+  if (typeof process === "undefined") {
+    return DEFAULT_INSTAGRAM_OAUTH_REDIRECT_URI;
+  }
+  return (
+    process.env.INSTAGRAM_REDIRECT_URI?.trim() ||
+    process.env.NEXT_PUBLIC_INSTAGRAM_REDIRECT_URI?.trim() ||
+    DEFAULT_INSTAGRAM_OAUTH_REDIRECT_URI
+  );
+}
+
+const DEFAULT_INSTAGRAM_APP_ID = "920212874225275";
+
+/** Browser + server: Instagram Login authorize URL (redirect_uri matches token exchange). */
+export function getInstagramOAuthAuthorizeUrl(): string {
+  const clientId =
+    (typeof process !== "undefined" &&
+      (process.env.NEXT_PUBLIC_INSTAGRAM_APP_ID?.trim() ||
+        process.env.INSTAGRAM_APP_ID?.trim())) ||
+    DEFAULT_INSTAGRAM_APP_ID;
+  const redirectUri = getInstagramOAuthRedirectUri();
+  const params = new URLSearchParams({
+    force_reauth: "true",
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    response_type: "code",
+    scope: INSTAGRAM_OAUTH_SCOPES,
+  });
+  return `https://www.instagram.com/oauth/authorize?${params.toString()}`;
+}
