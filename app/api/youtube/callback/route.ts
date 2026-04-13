@@ -64,10 +64,10 @@ export async function GET(request: Request) {
     }
 
     await connectDB();
-    const existingChannel = await YouTubeChannel.findOne({ userId, channelId: channel.id });
+    const existingChannel = await YouTubeChannel.findOne({ channelId: channel.id });
 
     await YouTubeChannel.findOneAndUpdate(
-      { userId, channelId: channel.id },
+      { channelId: channel.id },
       {
         userId,
         channelId: channel.id,

@@ -1,7 +1,8 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IInstagramAccount extends Document {
-  userId: string;
+  /** Last user who connected this account (stored only; not used for access checks). */
+  userId?: string;
   igUserId: string;
   pageId: string;
   username: string;
@@ -13,7 +14,7 @@ export interface IInstagramAccount extends Document {
 
 const InstagramAccountSchema = new Schema<IInstagramAccount>(
   {
-    userId: { type: String, required: true, index: true },
+    userId: { type: String, index: true },
     igUserId: { type: String, required: true },
     pageId: { type: String, required: true },
     username: { type: String, required: true },
@@ -23,7 +24,7 @@ const InstagramAccountSchema = new Schema<IInstagramAccount>(
   { timestamps: true }
 );
 
-InstagramAccountSchema.index({ userId: 1, igUserId: 1 }, { unique: true });
+InstagramAccountSchema.index({ igUserId: 1 }, { unique: true });
 
 const InstagramAccount =
   (mongoose.models.InstagramAccount as Model<IInstagramAccount> | undefined) ||

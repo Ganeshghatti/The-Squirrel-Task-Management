@@ -60,7 +60,6 @@ export async function POST(request: Request) {
 
     await connectDB();
     const accounts = await InstagramAccount.find({
-      userId,
       igUserId: { $in: accountIds },
     });
 

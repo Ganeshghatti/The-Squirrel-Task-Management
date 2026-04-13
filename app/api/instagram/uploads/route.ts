@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
   try {
     await connectDB();
-    const rows = await InstagramUploadHistory.find({ userId })
+    const rows = await InstagramUploadHistory.find({})
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();

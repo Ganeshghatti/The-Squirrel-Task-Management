@@ -128,7 +128,7 @@ export async function GET(request: Request) {
     await connectDB();
 
     await InstagramAccount.findOneAndUpdate(
-      { userId, igUserId },
+      { igUserId },
       {
         userId,
         igUserId,

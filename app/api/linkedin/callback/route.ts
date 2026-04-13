@@ -51,16 +51,18 @@ export async function GET(request: Request) {
     const profile = await fetchLinkedInPersonId(token.access_token);
 
     await connectDB();
-    await LinkedInAccount.findOneAndUpdate(
-      { userId },
-      {
-        userId,
-        personId: profile.sub,
-        accessToken: token.access_token,
-        expiresAt: token.expires_in ? new Date(Date.now() + token.expires_in * 1000) : undefined,
-      },
-      { upsert: true, new: true }
-    );
+    const existing = await LinkedInAccount.findOne().sort({ updatedAt: -1 });
+    const payload = {
+      userId,
+      personId: profile.sub,
+      accessToken: token.access_token,
+      expiresAt: token.expires_in ? new Date(Date.now() + token.expires_in * 1000) : undefined,
+    };
+    if (existing) {
+      await LinkedInAccount.updateOne({ _id: existing._id }, { $set: payload });
+    } else {
+      await LinkedInAccount.create(payload);
+    }
 
     return Response.redirect(`${origin}/linkedin?connected=true`);
   } catch (error) {

@@ -1,7 +1,8 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IYouTubeChannel extends Document {
-  userId: string;
+  /** Last user who connected this channel (stored only; not used for access checks). */
+  userId?: string;
   channelId: string;
   title: string;
   thumbnailUrl?: string;
@@ -14,7 +15,7 @@ export interface IYouTubeChannel extends Document {
 
 const YouTubeChannelSchema = new Schema<IYouTubeChannel>(
   {
-    userId: { type: String, required: true, index: true },
+    userId: { type: String, index: true },
     channelId: { type: String, required: true },
     title: { type: String, required: true },
     thumbnailUrl: { type: String },
@@ -25,7 +26,7 @@ const YouTubeChannelSchema = new Schema<IYouTubeChannel>(
   { timestamps: true }
 );
 
-YouTubeChannelSchema.index({ userId: 1, channelId: 1 }, { unique: true });
+YouTubeChannelSchema.index({ channelId: 1 }, { unique: true });
 
 const YouTubeChannel =
   (mongoose.models.YouTubeChannel as Model<IYouTubeChannel> | undefined) ||

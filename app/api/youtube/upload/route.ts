@@ -71,7 +71,6 @@ export async function POST(request: Request) {
 
     await connectDB();
     const channels = await YouTubeChannel.find({
-      userId,
       channelId: { $in: channelIds },
     });
 

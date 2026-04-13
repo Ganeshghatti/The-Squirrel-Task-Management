@@ -18,7 +18,7 @@ export async function GET() {
   }
 
   await connectDB();
-  const account = await LinkedInAccount.findOne({ userId }).lean();
+  const account = await LinkedInAccount.findOne().sort({ updatedAt: -1 }).lean();
 
   return Response.json({
     connected: Boolean(account?.accessToken && account?.personId),

@@ -291,7 +291,7 @@ export async function POST(request: Request) {
     }
 
     await connectDB();
-    const account = await LinkedInAccount.findOne({ userId });
+    const account = await LinkedInAccount.findOne().sort({ updatedAt: -1 }).lean();
 
     if (!account?.accessToken || !account.personId) {
       errorLog("LinkedIn not connected", { hasToken: Boolean(account?.accessToken), hasPersonId: Boolean(account?.personId) });

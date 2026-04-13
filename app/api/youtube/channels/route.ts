@@ -20,7 +20,7 @@ export async function GET() {
   try {
     await connectDB();
     const channels = await YouTubeChannel.find(
-      { userId },
+      {},
       { channelId: 1, title: 1, thumbnailUrl: 1, _id: 0 }
     ).lean();
 

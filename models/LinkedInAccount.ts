@@ -1,7 +1,8 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface ILinkedInAccount extends Document {
-  userId: string;
+  /** Last user who connected (stored only; not used for access checks). */
+  userId?: string;
   personId: string;
   accessToken: string;
   expiresAt?: Date | null;
@@ -11,7 +12,7 @@ export interface ILinkedInAccount extends Document {
 
 const LinkedInAccountSchema = new Schema<ILinkedInAccount>(
   {
-    userId: { type: String, required: true, index: true, unique: true },
+    userId: { type: String, index: true },
     personId: { type: String, required: true },
     accessToken: { type: String, required: true },
     expiresAt: { type: Date },
@@ -24,4 +25,3 @@ const LinkedInAccount =
   mongoose.model<ILinkedInAccount>("LinkedInAccount", LinkedInAccountSchema);
 
 export default LinkedInAccount;
-

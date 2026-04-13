@@ -20,7 +20,7 @@ export async function GET() {
   try {
     await connectDB();
     const accounts = await InstagramAccount.find(
-      { userId },
+      {},
       { igUserId: 1, username: 1, profilePictureUrl: 1, pageId: 1, _id: 0 }
     ).lean();
 
@@ -52,7 +52,7 @@ export async function DELETE(request: Request) {
 
   try {
     await connectDB();
-    const result = await InstagramAccount.deleteOne({ userId, igUserId });
+    const result = await InstagramAccount.deleteOne({ igUserId });
     if (result.deletedCount === 0) {
       return Response.json({ error: "Account not found" }, { status: 404 });
     }

@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     const limit = Number.isNaN(parsedLimit) ? 20 : Math.min(parsedLimit, 100);
 
     await connectDB();
-    const posts = await LinkedInUploadHistory.find({ userId })
+    const posts = await LinkedInUploadHistory.find({})
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();

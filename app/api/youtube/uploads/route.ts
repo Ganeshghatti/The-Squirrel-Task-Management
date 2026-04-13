@@ -23,7 +23,7 @@ export async function GET(request: Request) {
     const limit = Number.isNaN(parsedLimit) ? 20 : Math.min(parsedLimit, 100);
 
     await connectDB();
-    const uploads = await YouTubeUploadHistory.find({ userId })
+    const uploads = await YouTubeUploadHistory.find({})
       .sort({ createdAt: -1 })
       .limit(limit)
       .lean();
