@@ -11,7 +11,7 @@ interface LinkedInStatus {
 interface LinkedInHistoryItem {
   _id?: string;
   postId: string;
-  postType: "text" | "image" | "document";
+  postType: "text" | "image" | "video" | "document";
   text: string;
   createdAt?: string;
 }
@@ -117,9 +117,14 @@ export default function LinkedInManager() {
 
   const helper = useMemo(() => {
     if (files.length === 0) return "Text-only post.";
-    if (files.length === 1) return "1 file → image post.";
-    return `${files.length} files → document post (PDF).`;
-  }, [files.length]);
+    if (files.length === 1) {
+      const type = files[0]?.type || "";
+      if (type.startsWith("video/")) return "1 file → video post.";
+      if (type === "application/pdf") return "1 file → document post (PDF via LinkedIn Documents API).";
+      return "1 file → image post.";
+    }
+    return "Multiple files are not supported (attach a single PDF, image, or video).";
+  }, [files]);
 
   return (
     <div className="space-y-8">
@@ -180,7 +185,7 @@ export default function LinkedInManager() {
         <div className="glass-panel rounded-3xl p-6">
           <h2 className="text-lg font-semibold text-white">Create post</h2>
           <p className="mt-1 text-sm text-gray-400">
-            Attach 0 files for text-only, 1 file for image, multiple files for document.
+            Attach 0 files for text-only, 1 file for image/video/PDF.
           </p>
 
           <form onSubmit={onSubmit} className="mt-6 space-y-4">
@@ -204,7 +209,7 @@ export default function LinkedInManager() {
               <input
                 type="file"
                 multiple
-                accept="image/png,image/jpeg"
+                accept="image/png,image/jpeg,video/mp4,video/quicktime,video/webm,application/pdf"
                 onChange={(e) => setFiles(Array.from(e.target.files || []))}
                 className="block w-full text-sm text-gray-300 file:mr-4 file:rounded-xl file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-white/15"
               />

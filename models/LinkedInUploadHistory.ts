@@ -1,6 +1,6 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
-export type LinkedInPostType = "text" | "image" | "document";
+export type LinkedInPostType = "text" | "image" | "video" | "document";
 
 export interface ILinkedInUploadHistory extends Document {
   userId: string;
@@ -17,7 +17,7 @@ const LinkedInUploadHistorySchema = new Schema<ILinkedInUploadHistory>(
   {
     userId: { type: String, required: true, index: true },
     postId: { type: String, required: true },
-    postType: { type: String, required: true, enum: ["text", "image", "document"] },
+    postType: { type: String, required: true, enum: ["text", "image", "video", "document"] },
     text: { type: String, required: true },
     asset: { type: String },
     visibility: { type: String, default: "PUBLIC" },
