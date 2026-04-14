@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { google } from "googleapis";
 import { authOptions } from "@/lib/authOptions";
 import connectDB from "@/lib/mongodb";
-import { getGoogleClientCredentials } from "@/lib/youtubeAuth";
+import { getGoogleClientCredentials, getYouTubeOAuthRedirectUri } from "@/lib/youtubeAuth";
 import YouTubeUploadHistory from "@/models/YouTubeUploadHistory";
 import YouTubeChannel from "@/models/YouTubeChannel";
 
@@ -24,6 +24,18 @@ function parseChannelIds(value: FormDataEntryValue | null) {
   } catch {
     return [];
   }
+}
+
+function isInvalidGrant(err: unknown) {
+  const g = err as { message?: string; response?: { data?: { error?: string } } };
+  return g.message === "invalid_grant" || g.response?.data?.error === "invalid_grant";
+}
+
+function formatChannelUploadError(err: unknown) {
+  if (isInvalidGrant(err)) {
+    return "YouTube connection expired or was revoked. Open the YouTube page and connect your channel again.";
+  }
+  return err instanceof Error ? err.message : "Upload failed";
 }
 
 export async function POST(request: Request) {
@@ -83,6 +95,7 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await videoFile.arrayBuffer());
     const { client_id, client_secret } = getGoogleClientCredentials();
+    const redirectUri = getYouTubeOAuthRedirectUri(request);
     const results: Array<{
       channelId: string;
       title: string;
@@ -92,7 +105,7 @@ export async function POST(request: Request) {
     }> = [];
 
     for (const channel of channels) {
-      const oauth2Client = new google.auth.OAuth2(client_id, client_secret);
+      const oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirectUri);
       oauth2Client.setCredentials({
         access_token: channel.accessToken,
         refresh_token: channel.refreshToken,
@@ -186,7 +199,7 @@ export async function POST(request: Request) {
           videoId,
         });
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Upload failed";
+        const message = formatChannelUploadError(error);
 
         results.push({
           channelId: channel.channelId,

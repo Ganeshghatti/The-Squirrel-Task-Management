@@ -1,5 +1,12 @@
 import { existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
+import { getPublicOriginFromRequest } from "@/lib/getPublicOriginFromRequest";
+
+/** Must match the redirect used in `/api/youtube/auth` and token exchange in `/api/youtube/callback`. */
+export function getYouTubeOAuthRedirectUri(request: Request) {
+  const { origin } = getPublicOriginFromRequest(request);
+  return `${origin}/api/youtube/callback`;
+}
 
 export interface GoogleClientCredentials {
   client_id: string;

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { google } from "googleapis";
 import { authOptions } from "@/lib/authOptions";
 import connectDB from "@/lib/mongodb";
-import { getGoogleClientCredentials } from "@/lib/youtubeAuth";
+import { getGoogleClientCredentials, getYouTubeOAuthRedirectUri } from "@/lib/youtubeAuth";
 import YouTubeChannel from "@/models/YouTubeChannel";
 
 export async function GET(request: Request) {
@@ -34,9 +34,7 @@ export async function GET(request: Request) {
   }
 
   const { client_id, client_secret } = getGoogleClientCredentials();
-  const host = request.headers.get("host") || "localhost:3000";
-  const protocol = host.includes("localhost") ? "http" : "https";
-  const redirectUri = `${protocol}://${host}/api/youtube/callback`;
+  const redirectUri = getYouTubeOAuthRedirectUri(request);
   const oauth2Client = new google.auth.OAuth2(client_id, client_secret, redirectUri);
 
   try {

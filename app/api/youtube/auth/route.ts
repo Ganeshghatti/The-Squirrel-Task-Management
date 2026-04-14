@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authOptions";
-import { getGoogleClientCredentials, YOUTUBE_SCOPES } from "@/lib/youtubeAuth";
+import { getGoogleClientCredentials, getYouTubeOAuthRedirectUri, YOUTUBE_SCOPES } from "@/lib/youtubeAuth";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -17,9 +17,7 @@ export async function GET(request: Request) {
   }
 
   const { client_id, auth_uri } = getGoogleClientCredentials();
-  const host = request.headers.get("host") || "localhost:3000";
-  const protocol = host.includes("localhost") ? "http" : "https";
-  const redirectUri = `${protocol}://${host}/api/youtube/callback`;
+  const redirectUri = getYouTubeOAuthRedirectUri(request);
 
   const params = new URLSearchParams({
     client_id,

@@ -1,6 +1,7 @@
 /**
- * `request.url` on serverless / reverse proxies often points at an internal host
- * (e.g. localhost). Redirects must use the browser-facing origin instead.
+ * Behind a reverse proxy (e.g. Nginx on a VPS), `request.url` may not reflect the
+ * public origin. OAuth redirects should use the browser-facing host/proto from
+ * `x-forwarded-*` or `NEXTAUTH_URL` / `AUTH_URL`.
  */
 export function getPublicOriginFromRequest(request: Request): {
   origin: string;
@@ -47,10 +48,7 @@ export function getPublicOriginFromRequest(request: Request): {
     };
   }
 
-  const canonical =
-    process.env.NEXTAUTH_URL?.trim() ||
-    process.env.AUTH_URL?.trim() ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "");
+  const canonical = process.env.NEXTAUTH_URL?.trim() || process.env.AUTH_URL?.trim() || "";
 
   if (canonical) {
     try {
