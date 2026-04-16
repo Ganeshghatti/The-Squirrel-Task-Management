@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import knowledge from "@/const/ai_production_knowledge_base.json";
 
 type KnowledgeItem = {
@@ -18,8 +18,36 @@ type TwitterPostType = {
   elements_to_include?: string[];
 };
 
-function pickRandom<T>(items: T[]) {
-  return items[Math.floor(Math.random() * items.length)];
+function randomInt(maxExclusive: number) {
+  if (!Number.isFinite(maxExclusive) || maxExclusive <= 0) {
+    throw new Error("randomInt(maxExclusive) requires maxExclusive > 0");
+  }
+  // Prefer cryptographically-strong randomness when available.
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const uint32Max = 2 ** 32;
+    const threshold = uint32Max - (uint32Max % maxExclusive);
+    const buf = new Uint32Array(1);
+    while (true) {
+      crypto.getRandomValues(buf);
+      const value = buf[0]!;
+      if (value < threshold) return value % maxExclusive;
+    }
+  }
+  return Math.floor(Math.random() * maxExclusive);
+}
+
+function shuffleInPlace<T>(arr: T[]) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = randomInt(i + 1);
+    [arr[i], arr[j]] = [arr[j]!, arr[i]!];
+  }
+  return arr;
+}
+
+function refillBag<T>(source: readonly T[]) {
+  const bag = source.slice();
+  shuffleInPlace(bag);
+  return bag;
 }
 
 function formatObjectLines(obj?: Record<string, string>) {
@@ -37,9 +65,21 @@ export default function XPromptGenerator() {
   const [postType, setPostType] = useState<TwitterPostType | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const ideaBagRef = useRef<KnowledgeItem[] | null>(null);
+  const postTypeBagRef = useRef<TwitterPostType[] | null>(null);
+
   const randomize = useCallback(() => {
-    setIdea(pickRandom(knowledgeBase));
-    setPostType(pickRandom(postTypes));
+    if (!knowledgeBase?.length || !postTypes?.length) return;
+
+    if (!ideaBagRef.current?.length) {
+      ideaBagRef.current = refillBag(knowledgeBase);
+    }
+    if (!postTypeBagRef.current?.length) {
+      postTypeBagRef.current = refillBag(postTypes);
+    }
+
+    setIdea(ideaBagRef.current.pop() ?? null);
+    setPostType(postTypeBagRef.current.pop() ?? null);
     setCopied(false);
   }, [knowledgeBase, postTypes]);
 
