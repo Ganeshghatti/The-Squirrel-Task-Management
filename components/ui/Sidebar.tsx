@@ -10,6 +10,7 @@ import {
   Briefcase,
   Instagram,
   Sparkles,
+  KeyRound,
   LogOut,
   X,
 } from "lucide-react";
@@ -37,6 +38,7 @@ export default function Sidebar({ isOpen, setIsOpen, isAdmin }: SidebarProps) {
     ...((isAdmin || linkedinAccess) ? [{ icon: Briefcase, label: "LinkedIn", href: "/linkedin" }] : []),
     ...((isAdmin || instagramAccess) ? [{ icon: Instagram, label: "Instagram", href: "/instagram" }] : []),
     ...((isAdmin || xAccess) ? [{ icon: Sparkles, label: "X", href: "/x" }] : []),
+    ...(isAdmin ? [{ icon: KeyRound, label: "Credential Vault", href: "/credential-vault" }] : []),
     ...(isAdmin ? [{ icon: Users, label: "Team", href: "/team" }] : []),
   ];
 

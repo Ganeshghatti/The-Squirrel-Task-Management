@@ -14,6 +14,13 @@ export default withAuth(
         }
       | undefined;
 
+    if (pathname.startsWith("/team") || pathname.startsWith("/credential-vault")) {
+      const allowed = token?.role === "admin";
+      if (!allowed) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
+    }
+
     if (pathname.startsWith("/youtube")) {
       const allowed = token?.role === "admin" || token?.youtubeAccess === true;
       if (!allowed) {
@@ -54,6 +61,8 @@ export default withAuth(
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/team/:path*",
+    "/credential-vault/:path*",
     "/youtube/:path*",
     "/linkedin/:path*",
     "/instagram/:path*",
