@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 import UserGuard from "@/components/auth/UserGuard";
 import Navbar from "@/components/ui/Navbar";
 import Sidebar from "@/components/ui/Sidebar";
-import XPromptGenerator from "@/components/x/XPromptGenerator";
+import XPoster from "@/components/x/XPoster";
 import { useState } from "react";
 
 export default function XPage() {
@@ -22,7 +22,7 @@ export default function XPage() {
 
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
             <div className="mx-auto max-w-7xl">
-              <XPromptGenerator />
+              <XPoster />
             </div>
           </main>
         </div>

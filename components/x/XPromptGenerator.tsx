@@ -136,7 +136,7 @@ export default function XPromptGenerator() {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">X</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">Content</h1>
           <p className="mt-2 max-w-2xl text-sm text-gray-400 sm:text-base">
             Randomize a content idea + post type, then copy a prompt for any AI chat.
           </p>

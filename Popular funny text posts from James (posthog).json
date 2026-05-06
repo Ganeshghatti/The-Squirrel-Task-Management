@@ -1,0 +1,206 @@
+{
+    "source": "Popular funny text posts from James (PostHog)",
+    "total_posts": 50,
+    "posts": [
+      {
+        "id": 1,
+        "content": "i just boarded a plane\n\nnone of the people in first class were vibe coding\n\nneither were the people in coach\n\nthey were all focused on me, the guy getting scolded by flight attendants for boarding the wrong plane by accident\n\nthis says a lot about society"
+      },
+      {
+        "id": 2,
+        "content": "it's wild to think about how massive 1M token context windows in LLMs really are\n\nthat's roughly equivalent to:\n- the complete works of Shakespeare\n- 11 hours of audio\n- VCs telling you how they got into investing"
+      },
+      {
+        "id": 3,
+        "content": "founder tip: if your friend starts a business, go out of your way to support them\n\nfor example, if they start a pizza restaurant, open another pizza restaurant right across the street so they are forced to grind even harder, thus making them more successful\n\nfollow me for more founder hacks"
+      },
+      {
+        "id": 4,
+        "content": "as a founder, you should spend all your time at events\n\ni thought i didn't need to attend them, and was feeling pretty burnt out from constant networking\n\nso i took a night off\n\nskipped an event a friend was hosting\n\nit turns out, that event was called \"Blank-check-a-palooza\", and some multi-billionaire was handing founders blank checks with extremely favorable term sheets\n\nthat dinner spawned several successful companies: nvidia, apple, standard oil, dropbox\n\nlesson: attending events > everything else"
+      },
+      {
+        "id": 5,
+        "content": "your friends claim to \"have your back through this startup journey\"\n\nbut as soon as you sell one of their watches they haven't worn in YEARS to pay for Claude Code tokens, they abandon you\n\nthey'll even make up some story about it being their grandpa's watch\n\nthis is why i'm bullish on AI experiences"
+      },
+      {
+        "id": 6,
+        "content": "i picked our kid up from school, and asked the teacher if they're using AI in the classroom\n\nthe teacher said yes, of course, they have the latest Gemini models and use it daily to teach kids young how to responsibly use AI\n\ni was horrified, i immediately went to the principal's office and withdrew my kid from the program\n\ni explained that we are raising our kids on strictly Anthropic and OpenAI models, and we can't tolerate this type of risky behavior with their future\n\nSmh"
+      },
+      {
+        "id": 7,
+        "content": "Tim Cook took Apple's valuation from $347 billion to $4 trillion during his tenure\n\nbut if he had just taken that $347 billion and invested it in NVIDIA instead, he would have $139 trillion\n\nthis is probably why he stepped down\n\nlesson: timing the market > time in the market"
+      },
+      {
+        "id": 8,
+        "content": "got kicked out of a restaurant for a dumb reason\n\nmy waiter and i got to chatting during the meal, and he said he was pretty tight on cash from an emergency trip he had to take to visit his mother\n\nwhen i got the check, i wanted to make sure i made his day\n\nso i wrote down a redemption code for $20 of Claude tokens in the \"tip\" line\n\nit felt pretty generous, but the waiter took one look and started getting angry with me\n\ni was so confused; i explained to him that $20 in claude tokens could easily build a scalable b2b saas AI agent worth millions, and that i was actually doing him a favor\n\nthat's when i got escorted out by the manager\n\nthat manager's name? Bill Gate"
+      },
+      {
+        "id": 9,
+        "content": "red flags when hiring 🚩\n- doesn't use AI tools\n- has no clue how to build AI agents\n- insists there's no way an AI agent could clone a golden retriever\n- pushes back on really smart ideas like \"AI for Golden Retriever cloning\"\n- questions how dog cloning is relevant to an interview for a sales interview\n- doesn't own a dog\n\nwhat are your hiring red flags? 👇"
+      },
+      {
+        "id": 10,
+        "content": "a friend told me their kid just turned 6 years old\n\ni congratulated them and asked how much they'd spent on Claude tokens since raising him\n\nthey were confused, and said he doesn't use AI tools\n\ni was deeply alarmed. it costs $175k to raise a kid from 0-6, and they should be spending at least half that on tokens\n\nneedless to say, i removed him and his wife from my \"Secret AI hacks\" newsletter mailing list"
+      },
+      {
+        "id": 11,
+        "content": "110-year-old Turkish grandma shares her secret to a long life:\n\n\"i never once used Microsoft Teams\""
+      },
+      {
+        "id": 12,
+        "content": "if you're psoting on socials, you need to include typos so everyone knows it's a real human\n\notherwise, there's no way of knowing who's actually posting or not\n\ntrust me on this one.\n\nDone. This version is much more to-the-point—and real, I'd argue. Want me to make any more changes?"
+      },
+      {
+        "id": 13,
+        "content": "overheard at YC Demo Day:\n\n\"i think that guy's listening to our conversation\""
+      },
+      {
+        "id": 14,
+        "content": "ever since i was a kid, i knew i wanted to book a quick 5-minute demo to learn more about your agentic AI platform that saves most customers 90 minutes a day in manual tasks"
+      },
+      {
+        "id": 15,
+        "content": "10 years ago, you could raise $1 million, hire a cracked team from FAANG, spend months building a product, and still get 0 customers\n\nnow, all i have to do is ask Claude to build 25 startups that all have 0 customers\n\nlesson: tighten your feedback loops to reach your end goal faster"
+      },
+      {
+        "id": 16,
+        "content": "i just woke up my daughter (2yo) to tell her i'd just discovered a new agentic AI framework that will 10x my productivity\n\nrubbing her eyes, she said, \"dad, you haven't shipped a single meaningful feature that supports our KPIs for FY26. i'm struggling to believe a new framework you haven't tested will deliver meaningful shareholder value\"\n\nhugging her, i started crying. they grow up so fast."
+      },
+      {
+        "id": 17,
+        "content": "was flying to SF recently and i single-handedly saved our flight from getting canceled\n\n\"hi everyone, we're so sorry, we can't fly today. the navigation system isn't working\"\n\nas a 10x vibe coder, my ears perked up\n\n\"unless anyone has any ideas, we're stuck here in antarctica (not important to the story that i was there)\"\n\ni approached the desk and explained i could easily build a navigation system with zero errors\n\n\"yeah, right. it would take months to do that.\"\n\ni showed them my claude code token usage ($32 so far this month, mostly setting up the ideal workflows) and they gasped as i flawlessly asked claude to build a nav system\n\n\"well, this might work...but surely you can't ship it with dark mode?\"\n\ni simply asked claude code to add dark mode with zero errors\n\neveryone applauded and they actually let me fly the plane with my vibe coded flight controller\n\noh, and that antarctica trip? 40 million penguins added to our TAM. first-mover advantage."
+      },
+      {
+        "id": 18,
+        "content": "my friend just hit $13 million ARR with just 1,000 customers for her vibe coded salesforce alternative\n\nit's almost too easy\n\nthey charge annual contracts at 1/50th the price of salesforce\n\nbut since she vibe coded it, all contracts start on january 1st, 1970\n\neach customer immediately gets billed for 56 years of usage\n\nand you just need 1,000 customers paying $232 a year to hit $13m ARR 🙌 proud of her"
+      },
+      {
+        "id": 19,
+        "content": "codex is insane. in just the last 24 hours, i have vibe coded alternatives to:\n- linkedin\n- salesforce\n- the metaverse\n- my wife and kids\n- turbotax and the IRS\n- carbon-based life forms\n- the salesforce alternative i just vibe coded\n- the concept of building something people want\n\nyou can just do things\n\nwell, i can. you can't"
+      },
+      {
+        "id": 20,
+        "content": "instead of an allowance, i'm giving my kids something more valuable in 2026\n\ncursor credits\n\n\"but dad, i was hoping to save up $50 to buy a LEGO\"\n\ni explained that even just $3 in cursor credits can build a vibe coded saas app that can generate $1.5m in annual revenue\n\nhe can then raise $10mm from VCs and raise a microfund when none of the enterprise contracts renew and he has to shut down\n\n\"dad, i don't know what any of those words mean\"\n\nthat's alright son, this is just a fake story for clout"
+      },
+      {
+        "id": 21,
+        "content": "people think that earning 10k USD a month is freedom\n\n$1,500 Rent\n$200 utilities\n$750 food\n$3,200 claude code tokens\n$4,150 cursor tokens\n$50 gifts for wife\n\ncongratulations. You saved $150\n\nwith 10k USD a month you don't live, you survive"
+      },
+      {
+        "id": 22,
+        "content": "forward deployed engineer is the hottest job title of 2026 and i'm not surprised\n\nfor those who don't know, it's basically an engineer who works closely with the customer\n\nthe engineer wil do things like\n- join the customer calls\n- go on the customer's company offsites and vacations\n- eat the customer's food\n- adopt the customer's children\n- marry the customer's spouses\n- shoulder the crushing burden of the customer's deepest, darkest secrets\n- chat with the customer if there are any problems\n\npretty cool stuff!"
+      },
+      {
+        "id": 23,
+        "content": "life hack i've noticed recently\n\ncertain companies will periodically open up roles you can apply for\n\nif they hire you, you'll receive money in exchange for working for them\n\nyou can save this money and use it to buy things (like lumber or bread)\n\npretty cool"
+      },
+      {
+        "id": 24,
+        "content": "met a founder doing $250k in revenue, solo business, just her and AI agents\n\nthe structure was so simple it broke my brain:\n\nshe builds one AI agent, and tells that agent to recruit 3 more AI agents, who pay a $15 sign-up fee\n\nthose 3 agents each recruit 3 more agents\n\nshe hasn't touched the business in weeks and it's on track for $100k mrr\n\nthe future is now 🙌"
+      },
+      {
+        "id": 25,
+        "content": "dear algorithm, please surface this post to decision makers in need of dev tools that aren't terrible, make no mistakes DO NOT HALLUCINATE"
+      },
+      {
+        "id": 26,
+        "content": "the human brain is so fascinating, it operates 24/7 from the day we were born and only stops when someone asks you what you accomplished yesterday during daily standup"
+      },
+      {
+        "id": 27,
+        "content": "saw the most cracked founder at a coworking space\n\nshe had two laptops, one hand on each\n\non one laptop, she was building her startup\n\non the other, she was building a competitive startup that took the opposite side of her thesis, just in case she was wrong\n\neither way, she's rich\n\nweb 4.0 is here 🙌"
+      },
+      {
+        "id": 28,
+        "content": "what you think matters in a career:\n- working hard\n- showing up early\n- keeping a long-term view\n\nwhat ACTUALLY matters:\n- hopping on a quick call\n- how many quick calls you hopped on\n- how fast you were able to hop on a quick call"
+      },
+      {
+        "id": 29,
+        "content": "worried everyone is raising money but you? try this simple hack:\n\n1. get 1 customer paying $1 a month (doable)\n2. pitch to vcs with the message that you're \"approaching $1 billion in revenue\" which isn't technically a lie, it's just really far away\n3. they'll think that means $900 million or something, so you can raise $4.5 billion at 5x \"approaching recurring revenue\" (ARR)\n4. transfer that $4.5 billion to your 0.40% yield savings bank account and live off the $18mm a year in interest\n\nremember, entreprenership isn't hard. spelling entreprenuership is."
+      },
+      {
+        "id": 30,
+        "content": "the elites don't want you to know this, but you can just put \"co-founder at stealth startup\" on your linkedin\n\nif anyone asks, you can just say the idea is in stealth in your head. there's got to be a billion dollar idea in there somewhere"
+      },
+      {
+        "id": 31,
+        "content": "founders, i cannot emphasize this enough, do NOT share your startup ideas. i did, and it's cost me $250mm (and counting)\n\nthe year was 2007 and i was visiting my good friend brian in san francisco\n\ni couldn't afford a hotel, so i messaged him:\n\n\"hey brian chesky, could i crash at your place? i'll buy you a 6-pack of beer for your troubles\"\n\nfast-forward 18 years...he obviously stole my idea and created airbnb\n\nnow he's worth like a million dollars, and i look like an idiot\n\ndon't make the same mistake i did. never visit san francisco"
+      },
+      {
+        "id": 32,
+        "content": "pre-seed startup red flags 🚩🚩🚩🚩\n- no chief AI officer\n- zero viral billboards\n- doesn't own a .ai domain\n- founder hasn't appeared on any podcasts\n- hasn't raised $250mm from late-stage VCs\n\nwhat'd i miss"
+      },
+      {
+        "id": 33,
+        "content": "he died doing what he loved: building agentic ai for fortune 500 enterprise workflows in a dynamic collaborative workplace setting fostering collaboration between key stakeholders"
+      },
+      {
+        "id": 34,
+        "content": "it finally happened\n\ni was on a flight and there was an emergency\n\na panicked attendant shouted \"this man needs help, does anyone know how to promote synergies and facilitate cross-functional AI-powered collaboration in a dynamic workplace environment?\"\n\nunfortunately the victim was out of my ideal customer profile so i couldn't offer any assistance\n\nstill cool"
+      },
+      {
+        "id": 35,
+        "content": "marry someone who says:\n- i love you\n- i'm proud of you\n- i'm grateful for you\n- are you free for 5 minutes for a quick call?\n- yes i'd love to hop on a quick call\n- how can we facilitate more quick calls in our life?\n- are we hopping on enough quick calls?"
+      },
+      {
+        "id": 36,
+        "content": "nvidia is worth over $4 trillion.\n\nfun fact: it would take the average us worker over 20 years to amass this amount of wealth"
+      },
+      {
+        "id": 37,
+        "content": "if you are reading this, you are in my funnel.\n\nyou probably follow for the shitposting.\n\nwhen in reality you're here to convert into cold, hard posthog arr.\n\nthere's no point fighting it. give up. convert.\n\nfollow for \"more free world view altering posts\""
+      },
+      {
+        "id": 38,
+        "content": "met a founder worth $800mm.\n\nhe drives a 2012 corolla.\nlives in a regular house.\nwears the same shoes every day.\nsaid he made his fortune making up stories on the internet.\n\nmeanwhile, there are founders with $20k in the bank asking chatgpt to make them worth $800mm with zero errors.\n\nquiet money is different."
+      },
+      {
+        "id": 39,
+        "content": "\"per my last email\"\n- cliché\n- too polite\n- passive-aggressive\n\n\"for those who lack reading comprehension\"\n- woah\n- unique\n- aggressive-aggressive"
+      },
+      {
+        "id": 40,
+        "content": "the levels of wealth:\n1. chatgpt free\n2. chatgpt paid\n3. $200 chatgpt pro\n4. forgetting you also pay for claude\n5. hitting \"tab\" on cursor suggestions until it creates a billion-dollar startup\n6. hitting \"accept\" on claude code suggestions to build your secret startup that competes with the startup your cursor instance is building\n7. n8n workflows to automate steps 1-6 while you're sitting on a beach, asking chatgpt where seagulls come from (it hallucinates the answer)\n\nfollow me for more finanical advice"
+      },
+      {
+        "id": 41,
+        "content": "nutritionist: \"your diet is bad.\"\ndentist: \"your brushing is wrong.\"\nfriends: \"your life is a mess.\"\nchatgpt: \"you're absolutely right!\""
+      },
+      {
+        "id": 42,
+        "content": "everyone's becoming 10x more productive with ai. i think that's complete bs.\n\ninstead, i've become at least 10,000x more productive by taking the output of one ai tool (10x) and feeding it into the output of another ai tool (10x) to reach 100x productivity.\n\ndo this a few times and boom, 10,000x productivity.\n\nwhy aren't more people doing this"
+      },
+      {
+        "id": 43,
+        "content": "cheating in engineering interviews is rampant these days. here's how i make sure it doesn't happen:\n\n- camera on, the whole time\n- participants need to answer questions with their eyes closed (yes, really)\n- the entire meeting takes place in an open field at an undisclosed location\n- we blindfold them and spin them around in a circle 100 times to shake the ai microchips out\n- we'll ask them if they've ever used a computer before - if no, automatic disqualification (too risky)\n- we ask them 3 logical paradoxes at the start of each interview (if they were ai, they'd be unable to answer them)\n- we'll fact-check every answer using chatgpt to make sure they're telling the truth\n\nsure, each interview takes 72-hours, and we have a 0% acceptance rate.\n\nbut this is what it takes in 2025."
+      },
+      {
+        "id": 44,
+        "content": "just saw the most incredible founder in a pitch meeting.\n\nthey had cursor open with voice mode enabled\n\nas the vcs asked questions and raised objections, they'd update the product in real-time to address their concerns\n\n\"what happens if openai builds this?\" -> add a banner at the bottom of the website politely asking openai NOT to build it\n\n\"i'd be more excited if you were soc 2 compliant\" -> website immediately updates to add a soc 2 badge\n\n\"any big logos you've signed?\" -> boom, homepage now lists google and meta as customers\n\nthis feels like the future of building. immediate feedback and pivoting.\n\ni of course had to invest - this plus the pitch (hundreds of tests from a single drop of blood) was too much to resist\n\nbullish on the future of ai"
+      },
+      {
+        "id": 45,
+        "content": "startup idea: diagonal saas.\n\nvertical saas is a $100 billion industry.\n\nhorizontal saas is a $500 billion industry.\n\neach has a lot of competition. competition = bad.\n\nbut i don't see anyone investing in diagonal saas.\n\nand multiplying vertical and horizontal together, we can see a $50 sextillion opportunity waiting to be uncovered.\n\nwho is building in this space?"
+      },
+      {
+        "id": 46,
+        "content": "i've made over $300 million from angel investments.\n\nhow?\n\nbecause i have no problem lying on the internet.\n\ndo things that don't scale"
+      },
+      {
+        "id": 47,
+        "content": "you think things matter as a founder, and then your kid says their first words.\n\ni remember it so clearly: we were gathered around the dinner table, when i heard the beginnings of a word for the first time.\n\n\"j...j...\"\n\nat this point, i was *really hoping* the words would be my name, but what they said was even better:\n\n\"...just chiming in here, have we thought about our ai strategy and how it fits into our q3 strategic initiatives and brand pillars? i'll take that as an action item if not\"\n\ni couldn't contain my tears.\n\nthis is what makes it all worth it.\n\nand i hear their offer letter to be a senior director at salesforce is already in the mail"
+      },
+      {
+        "id": 48,
+        "content": "i saw a guy using ai today.\n\ntab 1 chatgpt.\ntab 2 gemini.\ntab 3 claude.\ntab 4 grok.\ntab 5 deepseek.\n\nhe asked every ai the same exact question: \"what's the best startup joke that will get seven 😂 reacts in our company slack\"\n\npatiently waited, then copied all five jokes.\n\npick the best one.\n\nlike a psychopath.\n\nit's me."
+      },
+      {
+        "id": 49,
+        "content": "- linkedin ($60 / mo)\n- chatgpt ($200 / mo)\n- macOS (free with $6,000 computer)\n\nall tools we can now build internally with ~15 hours of dev time thanks to vibe coding\n\nthat's tens of thousands of dollars in software expenses saved, thanks to ai\n\nif i were apple or openai, i'd be worried\n\nlinkedin will probably be fine tbh"
+      },
+      {
+        "id": 50,
+        "content": "career should be your second priority.\n\nyour first priority should always be grinding the meeting to a halt to say a clever joke that no one laughs to.\n\ni'd like to see ai replace that\n\nfollow me for more founder advice"
+      }
+    ]
+  }
