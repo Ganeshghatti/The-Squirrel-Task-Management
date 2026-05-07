@@ -9,6 +9,13 @@ import P from "pino";
 import path from "node:path";
 import fs from "node:fs/promises";
 
+/**
+ * WhatsApp / Baileys singleton for Next.js (single Node process).
+ *
+ * Critical (per Baileys auth docs): only ONE active socket should write to auth state.
+ * Overlapping makeWASocket + saveCreds causes thousands of pre-key-*.json files and failures.
+ */
+
 type ConnectionState = {
   connection: string;
   lastDisconnectStatusCode: number | null;
@@ -21,8 +28,10 @@ type WaService = {
   ready: boolean;
   state: ConnectionState;
   groupCache: NodeCache;
-  starting: Promise<void> | null;
   started: boolean;
+  /** In-flight connect; one at a time */
+  connectPromise: Promise<void> | null;
+  reconnectTimer: ReturnType<typeof setTimeout> | null;
 };
 
 declare global {
@@ -31,8 +40,11 @@ declare global {
 }
 
 const logger = P({ level: process.env.WA_LOG_LEVEL || "silent" });
-// Match your original project exactly: useMultiFileAuthState('auth_info')
-const authDir = path.join(process.cwd(), "auth_info");
+
+/** Stable path in prod (set in PM2 / .env): absolute path recommended */
+const authDir = process.env.WA_AUTH_DIR
+  ? path.resolve(process.env.WA_AUTH_DIR)
+  : path.join(process.cwd(), "auth_info");
 
 function getService(): WaService {
   if (!global.__waService) {
@@ -42,16 +54,16 @@ function getService(): WaService {
       ready: false,
       state: { connection: "idle", lastDisconnectStatusCode: null, lastDisconnectMessage: null },
       groupCache: new NodeCache({ stdTTL: 0, useClones: false }),
-      starting: null,
       started: false,
+      connectPromise: null,
+      reconnectTimer: null,
     };
   }
   return global.__waService;
 }
 
 export function getConnState() {
-  const s = getService();
-  return { ...s.state };
+  return { ...getService().state };
 }
 
 export function isStarted() {
@@ -66,17 +78,44 @@ export function isConnected() {
   return getService().ready;
 }
 
+/** Fully destroy socket so a new makeWASocket does not overlap (prevents auth file storm). */
+async function destroyCurrentSocket(s: WaService) {
+  const sock = s.sock;
+  s.sock = null;
+  s.ready = false;
+  if (!sock) return;
+  try {
+    sock.ev.removeAllListeners();
+  } catch {}
+  try {
+    await sock.end(undefined);
+  } catch {}
+}
+
+function clearReconnectTimer(s: WaService) {
+  if (s.reconnectTimer) {
+    clearTimeout(s.reconnectTimer);
+    s.reconnectTimer = null;
+  }
+}
+
+/** Debounced reconnect: reset delay on each close, then a single new socket (no overlap). */
+function scheduleReconnect(s: WaService) {
+  clearReconnectTimer(s);
+  s.reconnectTimer = setTimeout(() => {
+    s.reconnectTimer = null;
+    connectSockInternal().catch(() => {});
+  }, 2000);
+}
+
 export async function stopSock() {
   const s = getService();
-  try {
-    s.sock?.end?.();
-  } catch {}
-  s.sock = null;
+  clearReconnectTimer(s);
+  await destroyCurrentSocket(s);
   s.currentQR = null;
-  s.ready = false;
   s.state = { connection: "idle", lastDisconnectStatusCode: null, lastDisconnectMessage: null };
   s.groupCache.flushAll();
-  s.starting = null;
+  s.connectPromise = null;
   s.started = false;
 }
 
@@ -90,17 +129,25 @@ export async function resetAuth() {
   } catch {}
 }
 
-export async function startSock() {
+/**
+ * Single connection pipeline: tear down old socket, one useMultiFileAuthState, one makeWASocket.
+ */
+async function connectSockInternal() {
   const s = getService();
-  if (s.ready && s.sock) return;
-  if (s.starting) return s.starting;
 
-  s.starting = (async () => {
-    s.started = true;
+  if (s.connectPromise) {
+    await s.connectPromise;
+    return;
+  }
+
+  s.connectPromise = (async () => {
     await fs.mkdir(authDir, { recursive: true });
+
+    await destroyCurrentSocket(s);
+
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
 
-    let version: any = undefined;
+    let version: [number, number, number] | undefined = undefined;
     try {
       const latest = await fetchLatestBaileysVersion();
       version = latest?.version;
@@ -108,7 +155,7 @@ export async function startSock() {
       version = undefined;
     }
 
-    s.sock = makeWASocket({
+    const socket = makeWASocket({
       ...(version ? { version } : {}),
       auth: state,
       logger,
@@ -119,9 +166,11 @@ export async function startSock() {
       getMessage: async () => undefined,
     });
 
-    s.sock.ev.on("creds.update", saveCreds);
+    s.sock = socket;
 
-    s.sock.ev.on("connection.update", (update: any) => {
+    socket.ev.on("creds.update", saveCreds);
+
+    socket.ev.on("connection.update", (update: any) => {
       const { connection, lastDisconnect, qr } = update;
       if (qr) s.currentQR = qr;
       if (connection) s.state.connection = connection;
@@ -131,6 +180,7 @@ export async function startSock() {
         s.currentQR = null;
         s.state.lastDisconnectStatusCode = null;
         s.state.lastDisconnectMessage = null;
+        clearReconnectTimer(s);
       }
 
       if (connection === "close") {
@@ -142,42 +192,52 @@ export async function startSock() {
           lastDisconnect?.error?.toString?.() ||
           (code ? `statusCode=${code}` : null);
 
-        const shouldReconnect = code !== DisconnectReason.loggedOut;
-        if (shouldReconnect) {
-          // Match original behavior: reconnect by starting again (auth_info persists).
-          startSock().catch(() => {});
+        const shouldReconnect =
+          code !== DisconnectReason.loggedOut && code !== DisconnectReason.badSession;
+
+        if (shouldReconnect && s.started) {
+          scheduleReconnect(s);
+        } else {
+          clearReconnectTimer(s);
+          s.started = false;
         }
       }
     });
 
-    // Keep cache fresh as groups change.
-    s.sock.ev.on("groups.upsert", async (groups: any[]) => {
+    socket.ev.on("groups.upsert", async (groups: any[]) => {
       for (const g of groups) s.groupCache.set(g.id, g);
     });
-    s.sock.ev.on("groups.update", async (updates: any[]) => {
+    socket.ev.on("groups.update", async (updates: any[]) => {
       for (const u of updates) {
         if (!u?.id) continue;
         try {
-          const meta = await s.sock.groupMetadata(u.id);
+          const meta = await socket.groupMetadata(u.id);
           s.groupCache.set(u.id, meta);
         } catch {}
       }
     });
-    s.sock.ev.on("group-participants.update", async ({ id }: any) => {
+    socket.ev.on("group-participants.update", async ({ id }: any) => {
       if (!id) return;
       try {
-        const meta = await s.sock.groupMetadata(id);
+        const meta = await socket.groupMetadata(id);
         s.groupCache.set(id, meta);
       } catch {}
     });
   })();
 
   try {
-    await s.starting;
+    await s.connectPromise;
   } finally {
-    // Always clear; future reconnect attempts must be allowed.
-    s.starting = null;
+    s.connectPromise = null;
   }
+}
+
+export async function startSock() {
+  const s = getService();
+  s.started = true;
+  if (s.ready && s.sock) return;
+  clearReconnectTimer(s);
+  await connectSockInternal();
 }
 
 export async function primeGroupCache() {
@@ -225,4 +285,3 @@ export async function sendToGroups(
   }
   return results;
 }
-
