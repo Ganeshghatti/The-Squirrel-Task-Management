@@ -9,6 +9,7 @@ import {
   Video,
   Briefcase,
   Instagram,
+  FileText,
   Sparkles,
   KeyRound,
   LogOut,
@@ -36,6 +37,7 @@ export default function Sidebar({ isOpen, setIsOpen, isAdmin }: SidebarProps) {
   
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+    { icon: FileText, label: "Content", href: "/content" },
     ...((isAdmin || youtubeAccess) ? [{ icon: Video, label: "YouTube", href: "/youtube" }] : []),
     ...((isAdmin || linkedinAccess) ? [{ icon: Briefcase, label: "LinkedIn", href: "/linkedin" }] : []),
     ...((isAdmin || instagramAccess) ? [{ icon: Instagram, label: "Instagram", href: "/instagram" }] : []),
