@@ -14,6 +14,7 @@ export interface IUser extends Document {
   linkedinAccess: boolean;
   instagramAccess: boolean;
   xAccess: boolean;
+  waAccess: boolean;
   name?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -51,6 +52,10 @@ const UserSchema: Schema = new Schema(
       default: false,
     },
     xAccess: {
+      type: Boolean,
+      default: false,
+    },
+    waAccess: {
       type: Boolean,
       default: false,
     },

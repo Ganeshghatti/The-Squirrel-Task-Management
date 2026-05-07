@@ -13,6 +13,7 @@ import {
   KeyRound,
   LogOut,
   X,
+  MessageCircle,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -31,6 +32,7 @@ export default function Sidebar({ isOpen, setIsOpen, isAdmin }: SidebarProps) {
   const linkedinAccess = (session?.user as { linkedinAccess?: boolean } | undefined)?.linkedinAccess;
   const instagramAccess = (session?.user as { instagramAccess?: boolean } | undefined)?.instagramAccess;
   const xAccess = (session?.user as { xAccess?: boolean } | undefined)?.xAccess;
+  const waAccess = (session?.user as { waAccess?: boolean } | undefined)?.waAccess;
   
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
@@ -38,6 +40,7 @@ export default function Sidebar({ isOpen, setIsOpen, isAdmin }: SidebarProps) {
     ...((isAdmin || linkedinAccess) ? [{ icon: Briefcase, label: "LinkedIn", href: "/linkedin" }] : []),
     ...((isAdmin || instagramAccess) ? [{ icon: Instagram, label: "Instagram", href: "/instagram" }] : []),
     ...((isAdmin || xAccess) ? [{ icon: Sparkles, label: "X", href: "/x" }] : []),
+    ...((isAdmin || waAccess) ? [{ icon: MessageCircle, label: "WhatsApp", href: "/wa" }] : []),
     ...(isAdmin ? [{ icon: KeyRound, label: "Credential Vault", href: "/credential-vault" }] : []),
     ...(isAdmin ? [{ icon: Users, label: "Team", href: "/team" }] : []),
   ];

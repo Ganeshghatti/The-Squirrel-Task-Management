@@ -11,6 +11,7 @@ export default withAuth(
           linkedinAccess?: boolean;
           instagramAccess?: boolean;
           xAccess?: boolean;
+          waAccess?: boolean;
         }
       | undefined;
 
@@ -49,6 +50,13 @@ export default withAuth(
       }
     }
 
+    if (pathname.startsWith("/wa")) {
+      const allowed = token?.role === "admin" || token?.waAccess === true;
+      if (!allowed) {
+        return NextResponse.redirect(new URL("/dashboard", req.url));
+      }
+    }
+
     return NextResponse.next();
   },
   {
@@ -67,6 +75,7 @@ export const config = {
     "/linkedin/:path*",
     "/instagram/:path*",
     "/x/:path*",
+    "/wa/:path*",
   ],
 };
 

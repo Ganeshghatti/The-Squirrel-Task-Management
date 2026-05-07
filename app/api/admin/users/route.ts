@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { email, password, name, role, youtubeAccess, linkedinAccess, instagramAccess, xAccess } =
+    const { email, password, name, role, youtubeAccess, linkedinAccess, instagramAccess, xAccess, waAccess } =
       await request.json();
 
     if (!email || !password) {
@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
       linkedinAccess: Boolean(linkedinAccess),
       instagramAccess: Boolean(instagramAccess),
       xAccess: Boolean(xAccess),
+      waAccess: Boolean(waAccess),
     });
 
     return NextResponse.json(
@@ -84,6 +85,7 @@ export async function POST(request: NextRequest) {
           linkedinAccess: newUser.linkedinAccess,
           instagramAccess: newUser.instagramAccess,
           xAccess: newUser.xAccess,
+          waAccess: (newUser as any).waAccess,
         },
       },
       { status: 201 }

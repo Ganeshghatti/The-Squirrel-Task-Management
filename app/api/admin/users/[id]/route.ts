@@ -17,7 +17,7 @@ export async function PUT(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { email, name, role, password, youtubeAccess, linkedinAccess, instagramAccess, xAccess } =
+    const { email, name, role, password, youtubeAccess, linkedinAccess, instagramAccess, xAccess, waAccess } =
       await request.json();
     const userId = params.id;
 
@@ -31,6 +31,7 @@ export async function PUT(
       ...(linkedinAccess !== undefined ? { linkedinAccess: Boolean(linkedinAccess) } : {}),
       ...(instagramAccess !== undefined ? { instagramAccess: Boolean(instagramAccess) } : {}),
       ...(xAccess !== undefined ? { xAccess: Boolean(xAccess) } : {}),
+      ...(waAccess !== undefined ? { waAccess: Boolean(waAccess) } : {}),
     };
     
     if (password && password.trim() !== "") {
