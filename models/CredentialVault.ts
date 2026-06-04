@@ -39,6 +39,8 @@ export interface ICredentialVault extends Document {
   // Mapping / ownership
   createdBy: Types.ObjectId;
   sharedWithUsers: Types.ObjectId[];
+  /** People not in Team — display name only */
+  sharedWithExternalNames: string[];
 
   createdAt: Date;
   updatedAt: Date;
@@ -106,6 +108,10 @@ const CredentialVaultSchema: Schema = new Schema(
         index: true,
       },
     ],
+    sharedWithExternalNames: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );

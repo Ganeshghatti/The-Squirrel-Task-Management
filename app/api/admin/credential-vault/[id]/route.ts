@@ -5,6 +5,17 @@ import connectDB from "@/lib/mongodb";
 import CredentialVault from "@/models/CredentialVault";
 import { UserRole } from "@/models/User";
 
+function normalizeExternalNames(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  return Array.from(
+    new Set(
+      input
+        .map((x) => (typeof x === "string" ? x.trim() : ""))
+        .filter(Boolean)
+    )
+  );
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -33,6 +44,9 @@ export async function PUT(
         ...(body.apiSecret !== undefined ? { apiSecret: body.apiSecret } : {}),
         ...(body.sharedWithUsers !== undefined
           ? { sharedWithUsers: Array.isArray(body.sharedWithUsers) ? body.sharedWithUsers : [] }
+          : {}),
+        ...(body.sharedWithExternalNames !== undefined
+          ? { sharedWithExternalNames: normalizeExternalNames(body.sharedWithExternalNames) }
           : {}),
       },
       { new: true, runValidators: true }

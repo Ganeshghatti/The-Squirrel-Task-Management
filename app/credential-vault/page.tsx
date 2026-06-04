@@ -15,6 +15,8 @@ import {
   KeyRound,
   ShieldCheck,
   AlertTriangle,
+  Filter,
+  X,
 } from "lucide-react";
 
 type VaultAccessType = "api_key" | "user_role";
@@ -41,6 +43,7 @@ interface VaultItem {
   apiSecret?: string;
   createdBy?: UserRef;
   sharedWithUsers?: UserRef[];
+  sharedWithExternalNames?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -69,6 +72,7 @@ export default function CredentialVaultPage() {
     apiKey: string;
     apiSecret: string;
     sharedWithUsers: string[];
+    sharedWithExternalNames: string[];
   }>({
     accessType: "api_key",
     severity: "medium",
@@ -80,7 +84,12 @@ export default function CredentialVaultPage() {
     apiKey: "",
     apiSecret: "",
     sharedWithUsers: [],
+    sharedWithExternalNames: [],
   });
+
+  const [externalNameInput, setExternalNameInput] = useState("");
+  /** "" = all; user:<id> = team; ext:<name> = external */
+  const [filterPerson, setFilterPerson] = useState("");
 
   const isAdmin = (session?.user as any)?.role === "admin";
 
@@ -138,7 +147,9 @@ export default function CredentialVaultPage() {
       apiKey: "",
       apiSecret: "",
       sharedWithUsers: [],
+      sharedWithExternalNames: [],
     });
+    setExternalNameInput("");
   };
 
   const openCreate = () => {
@@ -164,7 +175,11 @@ export default function CredentialVaultPage() {
       sharedWithUsers: Array.isArray(it.sharedWithUsers)
         ? it.sharedWithUsers.map((u) => u._id).filter(Boolean)
         : [],
+      sharedWithExternalNames: Array.isArray(it.sharedWithExternalNames)
+        ? it.sharedWithExternalNames.filter(Boolean)
+        : [],
     });
+    setExternalNameInput("");
     setShowModal(true);
   };
 
@@ -218,6 +233,58 @@ export default function CredentialVaultPage() {
       }));
   }, [users]);
 
+  const personFilterOptions = useMemo(() => {
+    const team = userOptions.map((u) => ({
+      value: `user:${u.id}`,
+      label: u.label,
+      group: "team" as const,
+    }));
+
+    const externalNames = new Set<string>();
+    for (const it of items) {
+      for (const name of it.sharedWithExternalNames || []) {
+        if (name?.trim()) externalNames.add(name.trim());
+      }
+    }
+    const external = Array.from(externalNames)
+      .sort((a, b) => a.localeCompare(b))
+      .map((name) => ({
+        value: `ext:${name}`,
+        label: name,
+        group: "external" as const,
+      }));
+
+    return { team, external };
+  }, [items, userOptions]);
+
+  const filteredItems = useMemo(() => {
+    if (!filterPerson) return items;
+
+    if (filterPerson.startsWith("user:")) {
+      const userId = filterPerson.slice(5);
+      return items.filter((it) =>
+        Array.isArray(it.sharedWithUsers) &&
+        it.sharedWithUsers.some((u) => u._id === userId)
+      );
+    }
+
+    if (filterPerson.startsWith("ext:")) {
+      const name = filterPerson.slice(4);
+      return items.filter((it) =>
+        Array.isArray(it.sharedWithExternalNames) &&
+        it.sharedWithExternalNames.includes(name)
+      );
+    }
+
+    return items;
+  }, [items, filterPerson]);
+
+  const activeFilterLabel = useMemo(() => {
+    if (!filterPerson) return null;
+    const all = [...personFilterOptions.team, ...personFilterOptions.external];
+    return all.find((o) => o.value === filterPerson)?.label ?? null;
+  }, [filterPerson, personFilterOptions]);
+
   return (
     <AdminGuard>
       <div className="min-h-screen bg-[#050505] flex">
@@ -261,6 +328,67 @@ export default function CredentialVaultPage() {
                 </div>
               )}
 
+              <div className="bg-[#111] border border-white/5 rounded-2xl p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5 ml-1 uppercase flex items-center gap-1.5">
+                      <Filter size={14} />
+                      Filter by person
+                    </label>
+                    <select
+                      value={filterPerson}
+                      onChange={(e) => setFilterPerson(e.target.value)}
+                      className="w-full max-w-md px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-orange-500/50"
+                    >
+                      <option value="">All people</option>
+                      {personFilterOptions.team.length > 0 && (
+                        <optgroup label="Team (internal)">
+                          {personFilterOptions.team.map((o) => (
+                            <option key={o.value} value={o.value}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                      {personFilterOptions.external.length > 0 && (
+                        <optgroup label="External">
+                          {personFilterOptions.external.map((o) => (
+                            <option key={o.value} value={o.value}>
+                              {o.label}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                    </select>
+                  </div>
+                  {filterPerson ? (
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <span>
+                        Showing{" "}
+                        <span className="text-orange-400 font-medium">
+                          {filteredItems.length}
+                        </span>{" "}
+                        of {items.length}
+                        {activeFilterLabel ? (
+                          <>
+                            {" "}
+                            for <span className="text-gray-200">{activeFilterLabel}</span>
+                          </>
+                        ) : null}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setFilterPerson("")}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
+                      >
+                        <X size={14} />
+                        Clear
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
               <div className="bg-[#111] border border-white/5 rounded-2xl overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left min-w-[900px]">
@@ -287,8 +415,14 @@ export default function CredentialVaultPage() {
                             No credentials stored yet
                           </td>
                         </tr>
+                      ) : filteredItems.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-gray-500">
+                            No credentials match this person filter
+                          </td>
+                        </tr>
                       ) : (
-                        items.map((it) => {
+                        filteredItems.map((it) => {
                           const revealed = Boolean(revealIds[it._id]);
                           const isApi = it.accessType === "api_key";
                           return (
@@ -370,16 +504,22 @@ export default function CredentialVaultPage() {
 
                                   <div className="text-xs text-gray-400">
                                     <span className="text-gray-500">Shared with:</span>{" "}
-                                    {Array.isArray(it.sharedWithUsers) && it.sharedWithUsers.length > 0 ? (
-                                      <span className="text-gray-300">
-                                        {it.sharedWithUsers
-                                          .map((u) => u?.email || u?.name || "")
-                                          .filter(Boolean)
-                                          .join(", ")}
-                                      </span>
-                                    ) : (
-                                      <span className="text-gray-500">—</span>
-                                    )}
+                                    {(() => {
+                                      const team = Array.isArray(it.sharedWithUsers)
+                                        ? it.sharedWithUsers
+                                            .map((u) => u?.name || u?.email || "")
+                                            .filter(Boolean)
+                                        : [];
+                                      const external = Array.isArray(it.sharedWithExternalNames)
+                                        ? it.sharedWithExternalNames
+                                        : [];
+                                      const all = [...team, ...external];
+                                      return all.length > 0 ? (
+                                        <span className="text-gray-300">{all.join(", ")}</span>
+                                      ) : (
+                                        <span className="text-gray-500">—</span>
+                                      );
+                                    })()}
                                   </div>
                                 </div>
                               </td>
@@ -588,11 +728,11 @@ export default function CredentialVaultPage() {
 
                         <div>
                           <label className="block text-xs font-medium text-gray-400 mb-2 ml-1 uppercase">
-                            Shared with users (optional)
+                            Team members (optional)
                           </label>
                           <div className="max-h-40 overflow-y-auto rounded-xl border border-white/10 bg-white/5 p-3 space-y-2">
                             {userOptions.length === 0 ? (
-                              <p className="text-sm text-gray-500">No users found</p>
+                              <p className="text-sm text-gray-500">No team users found</p>
                             ) : (
                               userOptions.map((u) => (
                                 <label key={u.id} className="flex items-center gap-3 text-sm">
@@ -615,6 +755,81 @@ export default function CredentialVaultPage() {
                               ))
                             )}
                           </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-2 ml-1 uppercase">
+                            External people (name only, optional)
+                          </label>
+                          <p className="text-xs text-gray-500 mb-2 ml-1">
+                            For contractors or others not in Team — add a display name only.
+                          </p>
+                          <div className="flex gap-2">
+                            <input
+                              value={externalNameInput}
+                              onChange={(e) => setExternalNameInput(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  const name = externalNameInput.trim();
+                                  if (!name) return;
+                                  setForm((p) => ({
+                                    ...p,
+                                    sharedWithExternalNames: Array.from(
+                                      new Set([...p.sharedWithExternalNames, name])
+                                    ),
+                                  }));
+                                  setExternalNameInput("");
+                                }
+                              }}
+                              className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-orange-500/50"
+                              placeholder="e.g. Jane Contractor"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const name = externalNameInput.trim();
+                                if (!name) return;
+                                setForm((p) => ({
+                                  ...p,
+                                  sharedWithExternalNames: Array.from(
+                                    new Set([...p.sharedWithExternalNames, name])
+                                  ),
+                                }));
+                                setExternalNameInput("");
+                              }}
+                              className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-gray-200 hover:bg-white/15"
+                            >
+                              Add
+                            </button>
+                          </div>
+                          {form.sharedWithExternalNames.length > 0 ? (
+                            <ul className="mt-2 flex flex-wrap gap-2">
+                              {form.sharedWithExternalNames.map((name) => (
+                                <li
+                                  key={name}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm bg-white/10 border border-white/10 text-gray-200"
+                                >
+                                  {name}
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setForm((p) => ({
+                                        ...p,
+                                        sharedWithExternalNames: p.sharedWithExternalNames.filter(
+                                          (n) => n !== name
+                                        ),
+                                      }))
+                                    }
+                                    className="text-gray-400 hover:text-red-400"
+                                    aria-label={`Remove ${name}`}
+                                  >
+                                    ×
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : null}
                         </div>
 
                         <div className="flex justify-end gap-3 mt-6">

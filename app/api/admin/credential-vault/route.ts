@@ -9,6 +9,17 @@ import CredentialVault, {
 } from "@/models/CredentialVault";
 import { UserRole } from "@/models/User";
 
+function normalizeExternalNames(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  return Array.from(
+    new Set(
+      input
+        .map((x) => (typeof x === "string" ? x.trim() : ""))
+        .filter(Boolean)
+    )
+  );
+}
+
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -62,6 +73,7 @@ export async function POST(request: NextRequest) {
 
       createdBy: (session.user as any).id,
       sharedWithUsers: Array.isArray(body.sharedWithUsers) ? body.sharedWithUsers : [],
+      sharedWithExternalNames: normalizeExternalNames(body.sharedWithExternalNames),
     });
 
     const populated = await CredentialVault.findById(created._id)
