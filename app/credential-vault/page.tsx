@@ -90,6 +90,8 @@ export default function CredentialVaultPage() {
   const [externalNameInput, setExternalNameInput] = useState("");
   /** "" = all; user:<id> = team; ext:<name> = external */
   const [filterPerson, setFilterPerson] = useState("");
+  const [filterSeverity, setFilterSeverity] = useState<"" | VaultSeverity>("");
+  const [filterStatus, setFilterStatus] = useState<"" | VaultStatus>("");
 
   const isAdmin = (session?.user as any)?.role === "admin";
 
@@ -257,33 +259,49 @@ export default function CredentialVaultPage() {
     return { team, external };
   }, [items, userOptions]);
 
+  const hasActiveFilters = Boolean(filterPerson || filterSeverity || filterStatus);
+
   const filteredItems = useMemo(() => {
-    if (!filterPerson) return items;
+    return items.filter((it) => {
+      if (filterSeverity && it.severity !== filterSeverity) return false;
+      if (filterStatus && it.status !== filterStatus) return false;
 
-    if (filterPerson.startsWith("user:")) {
-      const userId = filterPerson.slice(5);
-      return items.filter((it) =>
-        Array.isArray(it.sharedWithUsers) &&
-        it.sharedWithUsers.some((u) => u._id === userId)
-      );
-    }
+      if (filterPerson.startsWith("user:")) {
+        const userId = filterPerson.slice(5);
+        if (
+          !Array.isArray(it.sharedWithUsers) ||
+          !it.sharedWithUsers.some((u) => u._id === userId)
+        ) {
+          return false;
+        }
+      } else if (filterPerson.startsWith("ext:")) {
+        const name = filterPerson.slice(4);
+        if (
+          !Array.isArray(it.sharedWithExternalNames) ||
+          !it.sharedWithExternalNames.includes(name)
+        ) {
+          return false;
+        }
+      }
 
-    if (filterPerson.startsWith("ext:")) {
-      const name = filterPerson.slice(4);
-      return items.filter((it) =>
-        Array.isArray(it.sharedWithExternalNames) &&
-        it.sharedWithExternalNames.includes(name)
-      );
-    }
-
-    return items;
-  }, [items, filterPerson]);
+      return true;
+    });
+  }, [items, filterPerson, filterSeverity, filterStatus]);
 
   const activeFilterLabel = useMemo(() => {
     if (!filterPerson) return null;
     const all = [...personFilterOptions.team, ...personFilterOptions.external];
     return all.find((o) => o.value === filterPerson)?.label ?? null;
   }, [filterPerson, personFilterOptions]);
+
+  const clearAllFilters = () => {
+    setFilterPerson("");
+    setFilterSeverity("");
+    setFilterStatus("");
+  };
+
+  const selectClassName =
+    "w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-orange-500/50";
 
   return (
     <AdminGuard>
@@ -328,17 +346,20 @@ export default function CredentialVaultPage() {
                 </div>
               )}
 
-              <div className="bg-[#111] border border-white/5 rounded-2xl p-4 sm:p-5">
-                <div className="flex flex-col sm:flex-row sm:items-end gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-xs font-medium text-gray-400 mb-1.5 ml-1 uppercase flex items-center gap-1.5">
-                      <Filter size={14} />
-                      Filter by person
+              <div className="bg-[#111] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-4">
+                <div className="flex items-center gap-2 text-xs font-medium text-gray-400 uppercase ml-1">
+                  <Filter size={14} />
+                  Filters
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1.5 ml-1">
+                      Person
                     </label>
                     <select
                       value={filterPerson}
                       onChange={(e) => setFilterPerson(e.target.value)}
-                      className="w-full max-w-md px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-orange-500/50"
+                      className={selectClassName}
                     >
                       <option value="">All people</option>
                       {personFilterOptions.team.length > 0 && (
@@ -361,32 +382,73 @@ export default function CredentialVaultPage() {
                       )}
                     </select>
                   </div>
-                  {filterPerson ? (
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <span>
-                        Showing{" "}
-                        <span className="text-orange-400 font-medium">
-                          {filteredItems.length}
-                        </span>{" "}
-                        of {items.length}
-                        {activeFilterLabel ? (
-                          <>
-                            {" "}
-                            for <span className="text-gray-200">{activeFilterLabel}</span>
-                          </>
-                        ) : null}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setFilterPerson("")}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white"
-                      >
-                        <X size={14} />
-                        Clear
-                      </button>
-                    </div>
-                  ) : null}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1.5 ml-1">
+                      Severity
+                    </label>
+                    <select
+                      value={filterSeverity}
+                      onChange={(e) =>
+                        setFilterSeverity(e.target.value as "" | VaultSeverity)
+                      }
+                      className={selectClassName}
+                    >
+                      <option value="">All severities</option>
+                      <option value="low">low</option>
+                      <option value="medium">medium</option>
+                      <option value="high">high</option>
+                      <option value="critical">critical</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1.5 ml-1">
+                      Status
+                    </label>
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value as "" | VaultStatus)}
+                      className={selectClassName}
+                    >
+                      <option value="">All statuses</option>
+                      <option value="active">active</option>
+                      <option value="rotated">rotated</option>
+                      <option value="revoked">revoked</option>
+                      <option value="expired">expired</option>
+                    </select>
+                  </div>
                 </div>
+                {hasActiveFilters ? (
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400 pt-1 border-t border-white/5">
+                    <span>
+                      Showing{" "}
+                      <span className="text-orange-400 font-medium">{filteredItems.length}</span> of{" "}
+                      {items.length}
+                    </span>
+                    {activeFilterLabel ? (
+                      <span className="px-2 py-0.5 rounded-md bg-white/5 text-gray-300">
+                        Person: {activeFilterLabel}
+                      </span>
+                    ) : null}
+                    {filterSeverity ? (
+                      <span className="px-2 py-0.5 rounded-md bg-white/5 text-gray-300">
+                        Severity: {filterSeverity}
+                      </span>
+                    ) : null}
+                    {filterStatus ? (
+                      <span className="px-2 py-0.5 rounded-md bg-white/5 text-gray-300">
+                        Status: {filterStatus}
+                      </span>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={clearAllFilters}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 hover:text-white ml-auto"
+                    >
+                      <X size={14} />
+                      Clear all
+                    </button>
+                  </div>
+                ) : null}
               </div>
 
               <div className="bg-[#111] border border-white/5 rounded-2xl overflow-hidden">
@@ -418,7 +480,7 @@ export default function CredentialVaultPage() {
                       ) : filteredItems.length === 0 ? (
                         <tr>
                           <td colSpan={6} className="p-8 text-center text-gray-500">
-                            No credentials match this person filter
+                            No credentials match the selected filters
                           </td>
                         </tr>
                       ) : (
