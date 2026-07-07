@@ -4,6 +4,11 @@ import { getPublicOriginFromRequest } from "@/lib/getPublicOriginFromRequest";
 
 /** Must match the redirect used in `/api/youtube/auth` and token exchange in `/api/youtube/callback`. */
 export function getYouTubeOAuthRedirectUri(request: Request) {
+  const fromEnv = process.env.YOUTUBE_REDIRECT_URI?.trim();
+  if (fromEnv) {
+    return fromEnv;
+  }
+
   const { origin } = getPublicOriginFromRequest(request);
   return `${origin}/api/youtube/callback`;
 }
