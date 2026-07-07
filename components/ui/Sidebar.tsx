@@ -15,6 +15,7 @@ import {
   LogOut,
   X,
   MessageCircle,
+  ThumbsUp,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -38,6 +39,7 @@ export default function Sidebar({ isOpen, setIsOpen, isAdmin }: SidebarProps) {
   const menuItems = [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: FileText, label: "Content", href: "/content" },
+    { icon: ThumbsUp, label: "Comment Suggestions", href: "/x-suggestions" },
     ...((isAdmin || youtubeAccess) ? [{ icon: Video, label: "YouTube", href: "/youtube" }] : []),
     ...((isAdmin || linkedinAccess) ? [{ icon: Briefcase, label: "LinkedIn", href: "/linkedin" }] : []),
     ...((isAdmin || instagramAccess) ? [{ icon: Instagram, label: "Instagram", href: "/instagram" }] : []),
