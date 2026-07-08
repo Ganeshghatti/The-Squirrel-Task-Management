@@ -3,6 +3,7 @@ import { google } from "googleapis";
 import { authOptions } from "@/lib/authOptions";
 import connectDB from "@/lib/mongodb";
 import { getGoogleClientCredentials, getYouTubeOAuthRedirectUri } from "@/lib/youtubeAuth";
+import { getPublicOriginFromRequest } from "@/lib/getPublicOriginFromRequest";
 import YouTubeChannel from "@/models/YouTubeChannel";
 
 export async function GET(request: Request) {
@@ -11,15 +12,17 @@ export async function GET(request: Request) {
   const role = (session?.user as { role?: string } | undefined)?.role;
   const youtubeAccess = (session?.user as { youtubeAccess?: boolean } | undefined)?.youtubeAccess;
 
+  const { origin } = getPublicOriginFromRequest(request);
+
   if (!userId) {
-    return Response.redirect(new URL("/login", new URL(request.url)));
+    return Response.redirect(new URL("/login", origin));
   }
 
   if (role !== "admin" && !youtubeAccess) {
-    return Response.redirect(`${new URL(request.url).origin}/dashboard`);
+    return Response.redirect(`${origin}/dashboard`);
   }
 
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const oauthError = searchParams.get("error");
 
