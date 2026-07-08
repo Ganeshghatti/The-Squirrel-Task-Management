@@ -56,3 +56,54 @@ export async function fetchLinkedInPersonId(accessToken: string) {
   return profileResponse.data as { sub: string };
 }
 
+/** Extracts a `urn:li:(activity|share|ugcPost):...` from a post_id field or a LinkedIn post URL. */
+export function resolveLinkedInObjectUrn(postId?: string, url?: string) {
+  const urnPattern = /urn:li:(?:activity|share|ugcPost):\d+/;
+
+  if (postId && urnPattern.test(postId)) {
+    return postId.match(urnPattern)![0];
+  }
+
+  if (url) {
+    const match = url.match(urnPattern);
+    if (match) return match[0];
+  }
+
+  return null;
+}
+
+// LinkedIn Social Actions (Comments) API.
+// https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/share-on-linkedin
+export async function postLinkedInComment(params: {
+  accessToken: string;
+  personId: string;
+  objectUrn: string;
+  text: string;
+}) {
+  const res = await axios.post(
+    `https://api.linkedin.com/v2/socialActions/${encodeURIComponent(params.objectUrn)}/comments`,
+    {
+      actor: `urn:li:person:${params.personId}`,
+      message: { text: params.text },
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${params.accessToken}`,
+        "Content-Type": "application/json",
+        "X-Restli-Protocol-Version": "2.0.0",
+      },
+      validateStatus: () => true,
+    }
+  );
+
+  if (res.status !== 200 && res.status !== 201) {
+    throw new Error(
+      typeof res.data === "string" ? res.data : JSON.stringify(res.data || { status: res.status })
+    );
+  }
+
+  const idFromHeader = res.headers["x-restli-id"] || res.headers["X-RestLi-Id"];
+  const idFromBody = (res.data as { id?: string } | undefined)?.id;
+  return idFromHeader || idFromBody;
+}
+
