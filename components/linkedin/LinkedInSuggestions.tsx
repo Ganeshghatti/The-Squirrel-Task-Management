@@ -8,13 +8,14 @@ type Suggestion = {
   post_id: string;
   data: {
     post_id?: string;
+    post_url?: string;
     author_name?: string;
     author_headline?: string;
-    text?: string;
-    url?: string;
-    category?: string;
+    text_snippet?: string;
     engagement?: { likes?: number; comments?: number; reposts?: number };
     posted_at?: string;
+    track?: string;
+    theme?: string;
     why_flagged?: string;
     suggested_comment?: string;
     [key: string]: unknown;
@@ -24,7 +25,7 @@ type Suggestion = {
 };
 
 const categoryStyles: Record<string, string> = {
-  niche: "border-blue-500/30 bg-blue-500/10 text-blue-400",
+  ai_technical: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   pain_point: "border-rose-500/30 bg-rose-500/10 text-rose-400",
   competitor: "border-sky-500/30 bg-sky-500/10 text-sky-400",
 };
@@ -75,7 +76,7 @@ export default function LinkedInSuggestions() {
   const categories = useMemo(() => {
     const set = new Set<string>();
     suggestions.forEach((s) => {
-      if (s.data?.category) set.add(s.data.category);
+      if (s.data?.theme) set.add(s.data.theme);
     });
     return Array.from(set);
   }, [suggestions]);
@@ -85,7 +86,7 @@ export default function LinkedInSuggestions() {
     const cutoff = days ? Date.now() - days * 24 * 60 * 60 * 1000 : null;
 
     return suggestions.filter((s) => {
-      if (categoryFilter !== "all" && s.data?.category !== categoryFilter) return false;
+      if (categoryFilter !== "all" && s.data?.theme !== categoryFilter) return false;
       if (cutoff && new Date(s.scraped_at).getTime() < cutoff) return false;
       return true;
     });
@@ -115,7 +116,7 @@ export default function LinkedInSuggestions() {
         const res = await fetch("/api/linkedin/comment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ post_id: s.post_id, url: s.data?.url, text }),
+          body: JSON.stringify({ post_id: s.post_id, url: s.data?.post_url, text }),
         });
         const json = await res.json();
 
@@ -230,8 +231,7 @@ export default function LinkedInSuggestions() {
             const d = s.data || {};
             const engagement = d.engagement || {};
             const catClass =
-              (d.category && categoryStyles[d.category]) ||
-              "border-white/10 bg-white/5 text-gray-300";
+              (d.theme && categoryStyles[d.theme]) || "border-white/10 bg-white/5 text-gray-300";
 
             return (
               <div key={s._id} className="glass-panel flex flex-col rounded-3xl p-6">
@@ -244,14 +244,21 @@ export default function LinkedInSuggestions() {
                       <p className="truncate text-xs text-gray-500">{d.author_headline}</p>
                     )}
                   </div>
-                  {d.category && (
-                    <span className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold capitalize ${catClass}`}>
-                      {String(d.category).replace(/_/g, " ")}
-                    </span>
-                  )}
+                  <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                    {d.theme && (
+                      <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold capitalize ${catClass}`}>
+                        {String(d.theme).replace(/_/g, " ")}
+                      </span>
+                    )}
+                    {d.track && (
+                      <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] font-semibold capitalize text-gray-400">
+                        {String(d.track).replace(/_/g, " ")}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <p className="mt-4 whitespace-pre-wrap text-sm text-gray-200">{d.text || "—"}</p>
+                <p className="mt-4 whitespace-pre-wrap text-sm text-gray-200">{d.text_snippet || "—"}</p>
 
                 <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
                   <span className="flex items-center gap-1">
@@ -267,6 +274,12 @@ export default function LinkedInSuggestions() {
                     Scraped {new Date(s.scraped_at).toLocaleDateString()}
                   </span>
                 </div>
+
+                {d.posted_at && (
+                  <p className="mt-1 text-xs text-gray-600">
+                    Posted {new Date(d.posted_at).toLocaleString()}
+                  </p>
+                )}
 
                 {d.why_flagged && (
                   <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -312,9 +325,9 @@ export default function LinkedInSuggestions() {
                     {copiedId === s._id ? <Check size={16} /> : <Copy size={16} />}
                     {copiedId === s._id ? "Copied" : "Copy"}
                   </button>
-                  {d.url && (
+                  {d.post_url && (
                     <a
-                      href={d.url}
+                      href={d.post_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10"

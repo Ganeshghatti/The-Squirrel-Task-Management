@@ -56,17 +56,23 @@ export async function fetchLinkedInPersonId(accessToken: string) {
   return profileResponse.data as { sub: string };
 }
 
-/** Extracts a `urn:li:(activity|share|ugcPost):...` from a post_id field or a LinkedIn post URL. */
+/** Resolves a `urn:li:activity:...` object URN from a post_id field or a LinkedIn post URL. */
 export function resolveLinkedInObjectUrn(postId?: string, url?: string) {
   const urnPattern = /urn:li:(?:activity|share|ugcPost):\d+/;
 
-  if (postId && urnPattern.test(postId)) {
-    return postId.match(urnPattern)![0];
+  if (postId) {
+    const embedded = postId.match(urnPattern);
+    if (embedded) return embedded[0];
+    // Scrapers commonly hand back the bare numeric activity id (e.g. "7480521542511214592").
+    if (/^\d+$/.test(postId)) return `urn:li:activity:${postId}`;
   }
 
   if (url) {
-    const match = url.match(urnPattern);
-    if (match) return match[0];
+    const embedded = url.match(urnPattern);
+    if (embedded) return embedded[0];
+    // Public post URLs look like .../activity-7480521542511214592-1MX_
+    const fromUrl = url.match(/activity-(\d+)/);
+    if (fromUrl) return `urn:li:activity:${fromUrl[1]}`;
   }
 
   return null;
