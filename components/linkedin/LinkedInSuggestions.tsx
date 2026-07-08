@@ -24,6 +24,15 @@ type Suggestion = {
   createdAt: string;
 };
 
+type CommentHistoryEntry = {
+  _id: string;
+  suggestionPostId: string;
+  commentId?: string;
+  text: string;
+  userName?: string;
+  createdAt: string;
+};
+
 const categoryStyles: Record<string, string> = {
   ai_technical: "border-blue-500/30 bg-blue-500/10 text-blue-400",
   pain_point: "border-rose-500/30 bg-rose-500/10 text-rose-400",
@@ -53,6 +62,7 @@ export default function LinkedInSuggestions() {
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [postingId, setPostingId] = useState<string | null>(null);
   const [postResult, setPostResult] = useState<Record<string, { ok: boolean; message: string }>>({});
+  const [commentHistory, setCommentHistory] = useState<CommentHistoryEntry[]>([]);
 
   const fetchSuggestions = useCallback(async () => {
     setLoading(true);
@@ -69,9 +79,31 @@ export default function LinkedInSuggestions() {
     }
   }, []);
 
+  const fetchCommentHistory = useCallback(async () => {
+    try {
+      const res = await fetch("/api/linkedin/comment");
+      if (!res.ok) return;
+      const json = await res.json();
+      setCommentHistory(Array.isArray(json) ? json : []);
+    } catch {
+      // Non-fatal — history is a supplementary display.
+    }
+  }, []);
+
   useEffect(() => {
     fetchSuggestions();
-  }, [fetchSuggestions]);
+    fetchCommentHistory();
+  }, [fetchSuggestions, fetchCommentHistory]);
+
+  const historyByPost = useMemo(() => {
+    const map = new Map<string, CommentHistoryEntry[]>();
+    commentHistory.forEach((entry) => {
+      const list = map.get(entry.suggestionPostId) || [];
+      list.push(entry);
+      map.set(entry.suggestionPostId, list);
+    });
+    return map;
+  }, [commentHistory]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -124,6 +156,10 @@ export default function LinkedInSuggestions() {
           throw new Error(json?.error || "Failed to post comment");
         }
 
+        if (json?.history) {
+          setCommentHistory((prev) => [json.history as CommentHistoryEntry, ...prev]);
+        }
+        setCommentDrafts((prev) => ({ ...prev, [s._id]: "" }));
         setPostResult((prev) => ({ ...prev, [s._id]: { ok: true, message: "Comment posted." } }));
       } catch (err: any) {
         setPostResult((prev) => ({
@@ -285,6 +321,22 @@ export default function LinkedInSuggestions() {
                   <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
                     <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Why this matters</p>
                     <p className="mt-2 text-sm text-gray-300">{d.why_flagged}</p>
+                  </div>
+                )}
+
+                {(historyByPost.get(s.post_id) || []).length > 0 && (
+                  <div className="mt-4 space-y-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+                    <p className="text-xs uppercase tracking-[0.2em] text-emerald-400/80">
+                      Posted from this dashboard
+                    </p>
+                    {(historyByPost.get(s.post_id) || []).map((entry) => (
+                      <div key={entry._id} className="rounded-xl border border-white/10 bg-black/20 p-3">
+                        <p className="text-sm text-gray-200">{entry.text}</p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          {entry.userName || "Someone"} · {new Date(entry.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 )}
 
