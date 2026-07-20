@@ -78,6 +78,24 @@ export function resolveLinkedInObjectUrn(postId?: string, url?: string) {
   return null;
 }
 
+/**
+ * LinkedIn's comment threads are keyed by the underlying content object's URN
+ * (urn:li:ugcPost:... or urn:li:share:...), not the public-facing activity URN.
+ * They usually share the same numeric id for simple original posts, but diverge
+ * for reshares/some org posts — LinkedIn's error response names the real one.
+ */
+function extractActualThreadUrn(data: unknown): string | null {
+  const message =
+    typeof data === "string"
+      ? data
+      : (data as { message?: string; serviceErrorMessage?: string } | undefined)?.message ||
+        (data as { serviceErrorMessage?: string } | undefined)?.serviceErrorMessage ||
+        JSON.stringify(data || {});
+
+  const match = message.match(/actual threadUrn:\s*(urn:li:(?:ugcPost|share|activity):\d+)/);
+  return match ? match[1]! : null;
+}
+
 // LinkedIn Social Actions (Comments) API.
 // https://learn.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/share-on-linkedin
 export async function postLinkedInComment(params: {
@@ -86,21 +104,31 @@ export async function postLinkedInComment(params: {
   objectUrn: string;
   text: string;
 }) {
-  const res = await axios.post(
-    `https://api.linkedin.com/v2/socialActions/${encodeURIComponent(params.objectUrn)}/comments`,
-    {
-      actor: `urn:li:person:${params.personId}`,
-      message: { text: params.text },
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${params.accessToken}`,
-        "Content-Type": "application/json",
-        "X-Restli-Protocol-Version": "2.0.0",
+  const attempt = async (objectUrn: string) =>
+    axios.post(
+      `https://api.linkedin.com/v2/socialActions/${encodeURIComponent(objectUrn)}/comments`,
+      {
+        actor: `urn:li:person:${params.personId}`,
+        message: { text: params.text },
       },
-      validateStatus: () => true,
+      {
+        headers: {
+          Authorization: `Bearer ${params.accessToken}`,
+          "Content-Type": "application/json",
+          "X-Restli-Protocol-Version": "2.0.0",
+        },
+        validateStatus: () => true,
+      }
+    );
+
+  let res = await attempt(params.objectUrn);
+
+  if (res.status === 400) {
+    const actualThreadUrn = extractActualThreadUrn(res.data);
+    if (actualThreadUrn && actualThreadUrn !== params.objectUrn) {
+      res = await attempt(actualThreadUrn);
     }
-  );
+  }
 
   if (res.status !== 200 && res.status !== 201) {
     throw new Error(
