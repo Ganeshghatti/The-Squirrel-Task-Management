@@ -3,25 +3,62 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ExternalLink, RefreshCw, Copy, Check, Heart, Repeat2, MessageCircle } from "lucide-react";
 
+type SuggestionData = Record<string, unknown> & {
+  author_name?: string;
+  author_handle?: string;
+  author_username?: string;
+  author_followers?: number;
+  author_bio?: string;
+  text?: string;
+  text_snippet?: string;
+  tweet_text?: string;
+  url?: string;
+  tweet_url?: string;
+  category?: string;
+  track?: string;
+  theme?: string;
+  engagement?: { likes?: number; replies?: number; retweets?: number; reposts?: number };
+  tweet_likes?: number;
+  tweet_replies?: number;
+  posted_at?: string;
+  tweet_created_at?: string;
+  why_flagged?: string;
+  suggested_comment?: string;
+};
+
 type Suggestion = {
   _id: string;
   tweet_id: string;
-  data: {
-    tweet_id?: string;
-    author_handle?: string;
-    author_name?: string;
-    text?: string;
-    url?: string;
-    category?: string;
-    engagement?: { likes?: number; replies?: number; retweets?: number };
-    posted_at?: string;
-    why_flagged?: string;
-    suggested_comment?: string;
-    [key: string]: unknown;
-  };
+  data: SuggestionData;
   scraped_at: string;
   createdAt: string;
 };
+
+// Fields rendered explicitly in the card header/body/footer — everything else in
+// `data` gets auto-rendered generically so new scraper fields are never hidden.
+const SHOWN_KEYS = new Set([
+  "tweet_id",
+  "author_name",
+  "author_handle",
+  "author_username",
+  "author_followers",
+  "author_bio",
+  "text",
+  "text_snippet",
+  "tweet_text",
+  "url",
+  "tweet_url",
+  "category",
+  "track",
+  "theme",
+  "engagement",
+  "tweet_likes",
+  "tweet_replies",
+  "posted_at",
+  "tweet_created_at",
+  "why_flagged",
+  "suggested_comment",
+]);
 
 const categoryStyles: Record<string, string> = {
   niche: "border-orange-500/30 bg-orange-500/10 text-orange-400",
@@ -40,6 +77,32 @@ function formatCount(n?: number) {
   if (!n) return "0";
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
   return `${n}`;
+}
+
+function humanizeKey(key: string) {
+  return key
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function renderValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "—";
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return String(value);
+  }
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+}
+
+function extraEntries(data: SuggestionData) {
+  return Object.entries(data).filter(([key, value]) => {
+    if (SHOWN_KEYS.has(key)) return false;
+    if (value === null || value === undefined || value === "") return false;
+    return true;
+  });
 }
 
 export default function XSuggestions() {
@@ -72,7 +135,8 @@ export default function XSuggestions() {
   const categories = useMemo(() => {
     const set = new Set<string>();
     suggestions.forEach((s) => {
-      if (s.data?.category) set.add(s.data.category);
+      const cat = s.data?.category || s.data?.theme;
+      if (cat) set.add(cat);
     });
     return Array.from(set);
   }, [suggestions]);
@@ -82,7 +146,8 @@ export default function XSuggestions() {
     const cutoff = days ? Date.now() - days * 24 * 60 * 60 * 1000 : null;
 
     return suggestions.filter((s) => {
-      if (categoryFilter !== "all" && s.data?.category !== categoryFilter) return false;
+      const cat = s.data?.category || s.data?.theme;
+      if (categoryFilter !== "all" && cat !== categoryFilter) return false;
       if (cutoff && new Date(s.scraped_at).getTime() < cutoff) return false;
       return true;
     });
@@ -188,44 +253,66 @@ export default function XSuggestions() {
           {filtered.map((s) => {
             const d = s.data || {};
             const engagement = d.engagement || {};
-            const catClass =
-              (d.category && categoryStyles[d.category]) ||
-              "border-white/10 bg-white/5 text-gray-300";
+            const cat = d.category || d.theme;
+            const catClass = (cat && categoryStyles[cat]) || "border-white/10 bg-white/5 text-gray-300";
+
+            const authorName = d.author_name || d.author_handle || d.author_username || "Unknown author";
+            const authorHandle = d.author_handle || d.author_username;
+            const text = d.tweet_text || d.text_snippet || d.text;
+            const url = d.tweet_url || d.url;
+            const postedAt = d.tweet_created_at || d.posted_at;
+            const likes = d.tweet_likes ?? engagement.likes;
+            const replies = d.tweet_replies ?? engagement.replies;
+            const reposts = engagement.retweets ?? engagement.reposts;
+            const extras = extraEntries(d);
 
             return (
               <div key={s._id} className="glass-panel flex flex-col rounded-3xl p-6">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-white">
-                      {d.author_name || d.author_handle || "Unknown author"}
-                    </p>
-                    {d.author_handle && (
-                      <p className="truncate text-xs text-gray-500">@{d.author_handle.replace(/^@/, "")}</p>
+                    <p className="truncate text-sm font-semibold text-white">{authorName}</p>
+                    {authorHandle && (
+                      <p className="truncate text-xs text-gray-500">@{authorHandle.replace(/^@/, "")}</p>
+                    )}
+                    {typeof d.author_followers === "number" && (
+                      <p className="truncate text-xs text-gray-600">
+                        {formatCount(d.author_followers)} followers
+                      </p>
                     )}
                   </div>
-                  {d.category && (
+                  {cat && (
                     <span className={`shrink-0 rounded-full border px-3 py-1 text-[11px] font-semibold capitalize ${catClass}`}>
-                      {String(d.category).replace(/_/g, " ")}
+                      {String(cat).replace(/_/g, " ")}
                     </span>
                   )}
                 </div>
 
-                <p className="mt-4 whitespace-pre-wrap text-sm text-gray-200">{d.text || "—"}</p>
+                {d.author_bio && (
+                  <p className="mt-2 text-xs text-gray-500">{d.author_bio}</p>
+                )}
+
+                <p className="mt-4 whitespace-pre-wrap text-sm text-gray-200">{text || "—"}</p>
 
                 <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
                   <span className="flex items-center gap-1">
-                    <Heart size={14} /> {formatCount(engagement.likes)}
+                    <Heart size={14} /> {formatCount(likes)}
                   </span>
                   <span className="flex items-center gap-1">
-                    <MessageCircle size={14} /> {formatCount(engagement.replies)}
+                    <MessageCircle size={14} /> {formatCount(replies)}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Repeat2 size={14} /> {formatCount(engagement.retweets)}
+                    <Repeat2 size={14} /> {formatCount(reposts)}
                   </span>
                   <span className="ml-auto">
                     Scraped {new Date(s.scraped_at).toLocaleDateString()}
                   </span>
                 </div>
+
+                {postedAt && (
+                  <p className="mt-1 text-xs text-gray-600">
+                    Posted {new Date(postedAt).toLocaleString()}
+                  </p>
+                )}
 
                 {d.why_flagged && (
                   <div className="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4">
@@ -233,6 +320,13 @@ export default function XSuggestions() {
                     <p className="mt-2 text-sm text-gray-300">{d.why_flagged}</p>
                   </div>
                 )}
+
+                {extras.map(([key, value]) => (
+                  <div key={key} className="mt-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+                    <p className="text-xs uppercase tracking-[0.2em] text-gray-500">{humanizeKey(key)}</p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm text-gray-300">{renderValue(value)}</p>
+                  </div>
+                ))}
 
                 {d.suggested_comment && (
                   <div className="mt-3 rounded-2xl border border-orange-500/20 bg-orange-500/5 p-4">
@@ -242,9 +336,9 @@ export default function XSuggestions() {
                 )}
 
                 <div className="mt-5 flex gap-3">
-                  {d.url && (
+                  {url && (
                     <a
-                      href={d.url}
+                      href={url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
